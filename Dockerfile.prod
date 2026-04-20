@@ -1,0 +1,38 @@
+# --- BACKEND PROD ---
+FROM python:3.10-slim-bullseye AS backend
+
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libpq-dev \
+    libgl1-mesa-glx \
+    libglib2.0-0 \
+    cmake \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install UV for fast dependency matching
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
+
+COPY backend/pyproject.toml .
+RUN uv pip install --system -r pyproject.toml
+
+COPY backend/ .
+
+EXPOSE 8000
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+
+# --- FRONTEND BUILD ---
+FROM node:18-alpine AS frontend-builder
+WORKDIR /app
+COPY frontend/package*.json ./
+RUN npm install
+COPY frontend/ .
+RUN npm run build
+
+# --- FINAL SERVE ---
+FROM nginx:alpine
+COPY --from=frontend-builder /app/dist /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]

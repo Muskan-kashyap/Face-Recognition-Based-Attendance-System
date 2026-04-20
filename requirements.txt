@@ -2,3 +2,14 @@ fastapi
 uvicorn[standard]
 opencv-python
 deepface
+face-recognition
+web3
+polars
+sqlalchemy
+psycopg2-binary
+pgvector
+passlib[bcrypt]
+python-jose[cryptography]
+python-multipart
+Pillow
+numpy
