@@ -992,3 +992,4 @@ class OfflineSyncQueue(Base):
 #     WHERE username = :uname
 #       AND hashed_password = crypt(:plain, hashed_password);
 # =============================================================================
+
