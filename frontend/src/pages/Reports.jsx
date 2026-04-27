@@ -1,219 +1,263 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import axios from 'axios';
-import { 
-    FileText, 
-    Download, 
-    Filter, 
-    Calendar, 
-    ChevronDown, 
-    FilePieChart,
-    Search,
-    Bell,
-    Github,
-    Slack,
-    Share2,
-    Database,
-    Zap
-} from 'lucide-react';
-import { 
-    BarChart, 
-    Bar, 
-    XAxis, 
-    YAxis, 
-    CartesianGrid, 
-    Tooltip, 
-    ResponsiveContainer,
-    Cell
-} from 'recharts';
+import { Download, Calendar, Users, Clock, AlertTriangle, TrendingUp } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { attendanceService } from '../services/attendanceService';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/Card';
+import { Button } from '../components/ui/Button';
+import { Badge } from '../components/ui/Badge';
+import { Spinner } from '../components/ui/Spinner';
+import { EmptyState } from '../components/ui/EmptyState';
+import { formatDate, formatTime, titleCase } from '../lib/utils';
 
-const Reports = () => {
-    const [dateRange, setDateRange] = useState('Last 7 Days');
-    const [logs, setLogs] = useState([]);
-    const [wellnessData, setWellnessData] = useState([]);
-    const [loading, setLoading] = useState(true);
+export default function Reports() {
+  const [logs, setLogs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [dateRange, setDateRange] = useState('7');
 
-    useEffect(() => {
-        const fetchReportData = async () => {
-            try {
-                const logsRes = await axios.get('http://127.0.0.1:8000/api/v1/attendance/logs');
-                const wellnessRes = await axios.get('http://127.0.0.1:8000/api/v1/attendance/wellness-heatmap');
-                
-                setLogs(logsRes.data);
-                setWellnessData(wellnessRes.data);
-            } catch (err) {
-                console.error("Failed to fetch workforce intel:", err);
-                // Fallback mock
-                setLogs([
-                    { id: 1, user_name: 'Captain Price', check_in: new Date().toISOString(), status: 'on_time', emotion: 'Neutral' },
-                ]);
-            } finally {
-                setLoading(false);
-            }
-        };
+  useEffect(() => {
+    fetchData();
+  }, [dateRange]);
 
-        fetchReportData();
-    }, []);
-    
-    const chartData = [
-        { name: 'Mon', count: 1200 },
-        { name: 'Tue', count: 1150 },
-        { name: 'Wed', count: 1210 },
-        { name: 'Thu', count: 1180 },
-        { name: 'Fri', count: 1225 },
-        { name: 'Sat', count: 450 },
-        { name: 'Sun', count: 380 },
-    ];
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const res = await attendanceService.getLogs({ limit: 200 });
+      setLogs(res.data || []);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  const filteredLogs = logs.slice(0, parseInt(dateRange) * 10);
+
+  const statusCounts = {
+    on_time: filteredLogs.filter((l) => l.status === 'on_time').length,
+    late: filteredLogs.filter((l) => l.status === 'late').length,
+    early: filteredLogs.filter((l) => l.status === 'early').length,
+  };
+
+  const pieData = [
+    { name: 'On Time', value: statusCounts.on_time, color: '#10b981' },
+    { name: 'Late', value: statusCounts.late, color: '#f59e0b' },
+    { name: 'Early', value: statusCounts.early, color: '#6366f1' },
+  ].filter((d) => d.value > 0);
+
+  const dailyData = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    const dayStr = d.toDateString();
+    const count = filteredLogs.filter((l) => new Date(l.check_in).toDateString() === dayStr).length;
+    dailyData.push({
+      day: d.toLocaleDateString('en', { weekday: 'short' }),
+      checkins: count,
+    });
+  }
+
+  if (loading) {
     return (
-        <div className="space-y-10">
-            <header className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
-                <div className="flex flex-col gap-1">
-                    <h2 className="text-4xl font-black italic tracking-tighter uppercase">Workforce Intelligence</h2>
-                    <p className="text-[10px] font-black text-text-muted tracking-[0.3em] uppercase opacity-50 italic">Generated Post-Scan Analytics // Secure Export Protocol Active</p>
-                </div>
-                <div className="flex gap-4 w-full md:w-auto">
-                    <div className="glass px-6 py-3 flex items-center gap-4 cursor-pointer hover:bg-white hover:bg-opacity-5 transition-all">
-                        <Calendar size={16} className="text-primary" />
-                        <span className="text-[10px] font-black uppercase tracking-widest">{dateRange}</span>
-                        <ChevronDown size={14} className="text-text-muted" />
-                    </div>
-                    <div className="flex gap-2">
-                        <button className="glass p-3 hover:text-success transition-all" title="Export Excel"><Download size={20} /></button>
-                        <button className="glass p-3 hover:text-danger transition-all" title="Export PDF"><FileText size={20} /></button>
-                        <button className="btn-primary px-8 py-3 flex items-center gap-3 font-black italic">
-                            <Zap size={18} /> SYNC BLOCKCHAIN
-                        </button>
-                    </div>
-                </div>
-            </header>
-
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                {/* AI Predictive Analytics */}
-                <div className="lg:col-span-8 card bg-white shadow-sm shadow-gray-200/50 p-8 space-y-6">
-                    <div className="flex justify-between items-center">
-                        <div className="flex items-center gap-3">
-                            <div className="p-2.5 bg-rose-50 rounded-xl text-rose-600">
-                                <Zap size={20} />
-                            </div>
-                            <h3 className="text-lg font-bold text-gray-900 uppercase tracking-tight">AI Burnout Risk Index</h3>
-                        </div>
-                        <span className="text-[10px] font-bold text-rose-600 bg-rose-50 px-3 py-1 rounded-full uppercase tracking-widest">High Alert Sectors</span>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <RiskIndicator label="Technical Recon" risk="High (84%)" color="text-rose-600" />
-                        <RiskIndicator label="Core Ops" risk="Low (12%)" color="text-emerald-500" />
-                        <RiskIndicator label="Support Lead" risk="Med (42%)" color="text-warning" />
-                    </div>
-
-                    <div className="mt-8 pt-8 border-t border-gray-100">
-                        <p className="text-xs font-medium text-gray-500 italic leading-relaxed">
-                            "Neural models detected abnormal shifts in check-in times for Sector 4. Predictive burnout probability has increased by 14% over the last 48 hours."
-                        </p>
-                    </div>
-                </div>
-
-                <div className="lg:col-span-4 card bg-indigo-600 border-none p-8 flex flex-col justify-between overflow-hidden relative group text-white">
-                    <div className="relative z-10">
-                        <h3 className="text-lg font-bold mb-2">Workforce Stability</h3>
-                        <p className="text-white/70 text-xs font-medium leading-relaxed">System-wide AI recognition models are synced with blockchain nodes.</p>
-                    </div>
-                    
-                    <div className="relative z-10 py-4">
-                        <div className="text-5xl font-extrabold tracking-tighter mb-1 italic">98.2%</div>
-                        <div className="text-[10px] font-bold text-white/50 uppercase tracking-widest">Model Accuracy</div>
-                    </div>
-                    
-                    <button className="relative z-10 w-full py-3 bg-white/10 hover:bg-white/20 text-white text-[10px] font-bold uppercase tracking-widest rounded-xl transition-all">
-                        Generate Stability Report
-                    </button>
-                    <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-pink-500 opacity-20 blur-[60px]" />
-                </div>
-
-                {/* Log Stream */}
-                <div className="lg:col-span-12 glass overflow-hidden">
-                    <div className="px-10 py-8 border-b border-white border-opacity-5 flex justify-between items-center">
-                        <div className="flex items-center gap-4">
-                            <Database size={18} className="text-primary" />
-                            <h3 className="text-xl font-black italic uppercase tracking-tighter">Secure Audit Trail</h3>
-                        </div>
-                        <div className="flex items-center gap-4">
-                             <div className="glass px-4 py-2 flex items-center gap-3 border-opacity-[0.03]">
-                                <Search size={14} className="text-text-muted" />
-                                <input type="text" placeholder="FILTER LOGS..." className="bg-transparent border-none outline-none text-[9px] font-black uppercase tracking-widest w-40" />
-                             </div>
-                             <Filter size={18} className="text-text-muted cursor-pointer hover:text-white transition-all" />
-                        </div>
-                    </div>
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left border-collapse">
-                            <thead>
-                                <tr className="bg-white bg-opacity-[0.01]">
-                                    <TableHead label="Operative" />
-                                    <TableHead label="Timestamp" />
-                                    <TableHead label="Verification" />
-                                    <TableHead label="Affective Core" />
-                                    <TableHead label="Blockchain Seal" />
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {logs.map((log, i) => (
-                                    <tr key={i} className="border-b border-white border-opacity-[0.02] hover:bg-white hover:bg-opacity-[0.01] transition-all">
-                                        <td className="p-8">
-                                            <span className="text-xs font-black uppercase tracking-tight">{log.user_name || 'Anonymous'}</span>
-                                        </td>
-                                        <td className="p-8">
-                                            <span className="text-[10px] font-bold uppercase tracking-widest text-text-muted">
-                                                {new Date(log.check_in).toLocaleTimeString()}
-                                            </span>
-                                        </td>
-                                        <td className="p-8">
-                                            <span className={`text-[10px] font-black uppercase tracking-widest italic ${log.status === 'on_time' ? 'text-success' : 'text-warning'}`}>
-                                                {log.status.replace('_', ' ')}
-                                            </span>
-                                        </td>
-                                        <td className="p-8">
-                                            <span className="text-[10px] font-bold uppercase tracking-widest text-text-muted italic">{log.emotion || 'Neural'}</span>
-                                        </td>
-                                        <td className="p-8 font-mono">
-                                            <div className="flex items-center gap-3">
-                                                <span className="text-[9px] font-bold text-primary opacity-50">
-                                                    {log.id.toString().padStart(6, '0')}...SEAL
-                                                </span>
-                                                <Share2 size={12} className="text-text-muted opacity-40 hover:opacity-100 cursor-pointer" />
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
-
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
+      <div className="flex items-center justify-center h-96">
+        <Spinner size="lg" />
+      </div>
     );
-};
+  }
 
-const RiskIndicator = ({ label, risk, color }) => (
-    <div className="flex flex-col gap-2 p-4 bg-gray-50 rounded-2xl border border-gray-100">
-        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{label}</span>
-        <span className={`text-sm font-bold ${color} italic`}>{risk}</span>
+  return (
+    <div className="space-y-8">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-white">Reports</h1>
+          <p className="text-sm text-gray-400 mt-1">Attendance analytics and insights</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <select
+            value={dateRange}
+            onChange={(e) => setDateRange(e.target.value)}
+            className="rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none"
+          >
+            <option value="7">Last 7 days</option>
+            <option value="30">Last 30 days</option>
+            <option value="90">Last 90 days</option>
+          </select>
+          <Button variant="secondary">
+            <Download className="mr-2 h-4 w-4" />
+            Export
+          </Button>
+        </div>
+      </div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center gap-4">
+              <div className="h-10 w-10 rounded-lg bg-indigo-500/10 flex items-center justify-center">
+                <Users className="h-5 w-5 text-indigo-400" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-white">{filteredLogs.length}</p>
+                <p className="text-sm text-gray-400">Total check-ins</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center gap-4">
+              <div className="h-10 w-10 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+                <Clock className="h-5 w-5 text-emerald-400" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-white">{statusCounts.on_time}</p>
+                <p className="text-sm text-gray-400">On time</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center gap-4">
+              <div className="h-10 w-10 rounded-lg bg-amber-500/10 flex items-center justify-center">
+                <AlertTriangle className="h-5 w-5 text-amber-400" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-white">{statusCounts.late + statusCounts.early}</p>
+                <p className="text-sm text-gray-400">Late / Early</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Daily Check-ins</CardTitle>
+            <CardDescription>Attendance volume over the past week</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={dailyData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+                  <XAxis dataKey="day" stroke="#64748b" fontSize={12} />
+                  <YAxis stroke="#64748b" fontSize={12} />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: '#0f172a',
+                      borderRadius: '8px',
+                      border: '1px solid #334155',
+                      color: '#e2e8f0',
+                      boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.3)',
+                    }}
+                  />
+                  <Bar dataKey="checkins" fill="#6366f1" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Status Breakdown</CardTitle>
+            <CardDescription>Distribution of attendance statuses</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="h-64 flex items-center justify-center">
+              {pieData.length === 0 ? (
+                <p className="text-sm text-gray-400">No data</p>
+              ) : (
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={pieData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={90}
+                      paddingAngle={4}
+                      dataKey="value"
+                    >
+                      {pieData.map((entry, index) => (
+                        <Cell key={index} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: '#0f172a',
+                        borderRadius: '8px',
+                        border: '1px solid #334155',
+                        color: '#e2e8f0',
+                      }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              )}
+            </div>
+            <div className="flex justify-center gap-4 mt-4">
+              {pieData.map((d) => (
+                <div key={d.name} className="flex items-center gap-2">
+                  <span className="h-3 w-3 rounded-full" style={{ backgroundColor: d.color }} />
+                  <span className="text-sm text-gray-400">{d.name}: {d.value}</span>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Audit table */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Audit Log</CardTitle>
+          <CardDescription>Detailed attendance records</CardDescription>
+        </CardHeader>
+        <CardContent className="p-0">
+          {filteredLogs.length === 0 ? (
+            <EmptyState title="No records" description="No attendance data for the selected period." />
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left">
+                <thead>
+                  <tr className="border-b border-gray-800 bg-gray-800/50">
+                    <th className="px-6 py-3 text-xs font-semibold text-gray-400 uppercase">Employee</th>
+                    <th className="px-6 py-3 text-xs font-semibold text-gray-400 uppercase">Date</th>
+                    <th className="px-6 py-3 text-xs font-semibold text-gray-400 uppercase">Time</th>
+                    <th className="px-6 py-3 text-xs font-semibold text-gray-400 uppercase">Status</th>
+                    <th className="px-6 py-3 text-xs font-semibold text-gray-400 uppercase">Source</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-800">
+                  {filteredLogs.slice(0, 20).map((log) => (
+                    <tr key={log.id} className="hover:bg-gray-800/50 transition-colors">
+                      <td className="px-6 py-3 text-sm text-white">{log.user_name || `User #${log.user_id}`}</td>
+                      <td className="px-6 py-3 text-sm text-gray-400">{formatDate(log.check_in)}</td>
+                      <td className="px-6 py-3 text-sm text-gray-400">{formatTime(log.check_in)}</td>
+                      <td className="px-6 py-3">
+                        <Badge
+                          variant={
+                            log.status === 'on_time'
+                              ? 'success'
+                              : log.status === 'late'
+                              ? 'warning'
+                              : 'default'
+                          }
+                        >
+                          {titleCase(log.status)}
+                        </Badge>
+                      </td>
+                      <td className="px-6 py-3 text-sm text-gray-400 capitalize">{log.source}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
-);
+  );
+}
 
-const QuickStat = ({ label, value }) => (
-    <div className="flex flex-col items-end">
-        <span className="text-[8px] font-black text-text-muted uppercase tracking-widest">{label}</span>
-        <span className="text-xs font-black italic uppercase tracking-tight text-white">{value}</span>
-    </div>
-);
-
-const TableHead = ({ label }) => (
-    <th className="p-8 text-[10px] font-black uppercase tracking-[0.2em] text-text-muted italic opacity-40">
-        {label}
-    </th>
-);
-
-export default Reports;

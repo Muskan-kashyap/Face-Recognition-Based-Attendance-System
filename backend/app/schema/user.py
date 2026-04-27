@@ -4,16 +4,6 @@ from typing import Optional, List
 from datetime import datetime
 
 
-# ── Auth Tokens ───────────────────────────────────────────────────────────────
-class Token(BaseModel):
-    access_token: str
-    token_type: str
-
-
-class TokenPayload(BaseModel):
-    sub: Optional[int] = None
-
-
 # ── Registration ──────────────────────────────────────────────────────────────
 class UserSignup(BaseModel):
     name: str

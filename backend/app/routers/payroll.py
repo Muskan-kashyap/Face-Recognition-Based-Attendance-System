@@ -7,12 +7,15 @@ from app.crud.crud_payroll import payroll as crud_payroll
 from app.api import deps
 from app.schema.payroll import PayrollResponse, PayrollCreate, PayrollUpdate
 from app.db.models.all_models import User, Payroll, Reimbursement, AttendanceLog, BlockchainAuditLog
-from app.db.database import get_db
+from app.db.database import get_db, SessionLocal
 from app.services.blockchain import blockchain_service
 
 router = APIRouter()
 
-async def background_blockchain_anchor(db: Session, ref_id: int, payload: dict, ref_type: str):
+
+async def background_blockchain_anchor(ref_id: int, payload: dict, ref_type: str):
+    """Background blockchain anchoring with isolated DB session."""
+    db = SessionLocal()
     try:
         tx_hash = blockchain_service.anchor_record(ref_id, ref_type, payload)
         audit = BlockchainAuditLog(
@@ -24,7 +27,10 @@ async def background_blockchain_anchor(db: Session, ref_id: int, payload: dict, 
         db.add(audit)
         db.commit()
     except Exception:
-        pass # Log in production
+        db.rollback()
+    finally:
+        db.close()
+
 
 @router.get("/", response_model=List[PayrollResponse])
 def read_payrolls(
@@ -36,6 +42,7 @@ def read_payrolls(
     if current_user.role.name not in ["Admin", "Manager"]:
         return db.query(Payroll).filter(Payroll.user_id == current_user.id).all()
     return crud_payroll.get_multi_by_org(db, org_id=current_user.org_id, month=month, year=year)
+
 
 @router.post("/generate", response_model=List[PayrollResponse])
 async def generate_payroll(
@@ -51,10 +58,10 @@ async def generate_payroll(
     """
     if current_user.role.name not in ["Admin", "Manager"]:
         raise HTTPException(status_code=403, detail="Forbidden")
-        
+
     # 1. Bulk fetch deductions
     late_counts = db.query(
-        AttendanceLog.user_id, 
+        AttendanceLog.user_id,
         func.count(AttendanceLog.id).label('count')
     ).join(User).filter(
         User.org_id == current_user.org_id,
@@ -78,30 +85,32 @@ async def generate_payroll(
 
     users = db.query(User).filter(User.org_id == current_user.org_id, User.is_deleted == 0).all()
     results = []
-    
+
     for u in users:
         base_salary = 50000.0
         deductions = float(late_map.get(u.id, 0) * 10.0)
         reimb_total = reimb_map.get(u.id, 0.0)
         total_salary = base_salary - deductions + reimb_total
-        
+
         existing = crud_payroll.get_by_user(db, user_id=u.id, month=month, year=year)
         if existing:
             existing.base_salary, existing.deductions = base_salary, deductions
             existing.reimbursements_total, existing.total_salary = reimb_total, total_salary
-            db.add(existing); payroll_obj = existing
+            db.add(existing)
+            payroll_obj = existing
         else:
             payroll_obj = crud_payroll.create(db, obj_in=PayrollCreate(
                 user_id=u.id, month=month, year=year, base_salary=base_salary,
                 deductions=deductions, reimbursements_total=reimb_total, total_salary=total_salary
             ), org_id=u.org_id)
-        
+
         results.append(payroll_obj)
         payload = {"id": payroll_obj.id, "user": u.username, "total": total_salary}
-        background_tasks.add_task(background_blockchain_anchor, db, payroll_obj.id, payload, "payroll")
+        background_tasks.add_task(background_blockchain_anchor, payroll_obj.id, payload, "payroll")
 
     db.commit()
     return results
+
 
 @router.patch("/{payroll_id}", response_model=PayrollResponse)
 def update_payroll_status(
@@ -114,19 +123,20 @@ def update_payroll_status(
 ) -> Any:
     if current_user.role.name not in ["Admin", "Manager"]:
         raise HTTPException(status_code=403, detail="Forbidden")
-        
+
     # SECURE: Filter by org_id
     payroll_obj = db.query(Payroll).filter(
         Payroll.id == payroll_id,
         Payroll.org_id == current_user.org_id
     ).first()
-    
+
     if not payroll_obj:
         raise HTTPException(status_code=404, detail="Payroll not found")
-        
+
     updated = crud_payroll.update(db, db_obj=payroll_obj, obj_in=status_in)
     payload = {"id": updated.id, "status": updated.status, "by": current_user.username}
-    background_tasks.add_task(background_blockchain_anchor, db, updated.id, payload, "payroll")
+    background_tasks.add_task(background_blockchain_anchor, updated.id, payload, "payroll")
     db.commit()
-    
+
     return updated
+

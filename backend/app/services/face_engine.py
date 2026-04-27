@@ -1,5 +1,8 @@
+import logging
 import numpy as np
 from typing import List, Optional
+
+logger = logging.getLogger(__name__)
 
 try:
     import face_recognition
@@ -15,28 +18,26 @@ class FaceEngine:
         If no face or multiple faces are detected, return None.
         """
         if not FACE_RECOGNITION_AVAILABLE:
-            # CRITICAL: Do NOT return a mock embedding — that would let any face match.
-            # Raise so the router can return a 503 and prompt manual check-in.
             raise RuntimeError("face_recognition module not available. Biometric service offline.")
-            
+
         import io
         from PIL import Image
-        
+
         try:
             image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
             image_array = np.array(image)
         except Exception as e:
-            print(f"Error loading image: {e}")
+            logger.error("Error loading image: %s", e)
             return None
 
         face_locations = face_recognition.face_locations(image_array)
         if len(face_locations) != 1:
             return None
-            
+
         face_encodings = face_recognition.face_encodings(image_array, face_locations)
         if len(face_encodings) == 0:
             return None
-            
+
         return face_encodings[0].tolist()
 
     @staticmethod
@@ -48,7 +49,7 @@ class FaceEngine:
         enc2 = np.array(embedding2)
         distance = np.linalg.norm(enc1 - enc2)
         return distance <= tolerance
-        
+
     @staticmethod
     def get_emotion(image_bytes: bytes) -> str:
         """
@@ -58,21 +59,22 @@ class FaceEngine:
             from deepface import DeepFace
             import io
             from PIL import Image
-            
+
             image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
             image_array = np.array(image)
-            
+
             objs = DeepFace.analyze(
-                img_path=image_array, 
+                img_path=image_array,
                 actions=['emotion'],
                 enforce_detection=False
             )
-            
+
             if objs:
                 return objs[0]['dominant_emotion']
             return "neutral"
         except Exception as e:
-            print(f"Emotion analysis failed: {e}")
+            logger.error("Emotion analysis failed: %s", e)
             return "neutral"
 
 face_engine = FaceEngine()
+
