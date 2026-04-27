@@ -1,30 +1,14 @@
 """
 database.py — Single source of truth for DB connection.
-Credentials MUST be set via the DATABASE_URL environment variable in production.
-The hardcoded fallback is for local development ONLY.
+Credentials MUST be set via environment variables in production.
+The fallbacks are for local development ONLY.
 """
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-import os
-from urllib.parse import quote_plus
 
-# SECURITY NOTE: Set DATABASE_URL in your .env file for production.
-# Never commit real credentials to version control.
-# SQLALCHEMY_DATABASE_URL = os.getenv(
-#     "DATABASE_URL",
-#     "postgresql+psycopg2://postgres:password@localhost:5432/attendance"
-# )
-# Get variables with fallbacks
-user = os.getenv("DB_USER", "postgres")
-password = os.getenv("DB_PASSWORD", "Hrhk@9090")
-host = os.getenv("DB_HOST", "localhost")
-port = os.getenv("DB_PORT", "5432")
-name = os.getenv("DB_NAME", "attendance")
+from app.core.config import settings
 
-# URL-encode the password to handle the '@' symbol
-safe_password = quote_plus(password)
-
-SQLALCHEMY_DATABASE_URL = f"postgresql+psycopg2://{user}:{safe_password}@{host}:{port}/{name}"
+SQLALCHEMY_DATABASE_URL = settings.DATABASE_URL
 
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL,

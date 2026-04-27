@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict, Optional
 from sqlalchemy.orm import Session
 from app.core.security import get_password_hash
@@ -8,16 +8,25 @@ from app.db.models.all_models import User, FaceEmbedding, Organization, Role
 
 class CRUDUser:
     def get(self, db: Session, *, id: int) -> Optional[User]:
-        return db.query(User).filter(User.id == id).first()
+        return db.query(User).filter(User.id == id, User.is_deleted == 0).first()
 
     def get_by_email(self, db: Session, *, email: str) -> Optional[User]:
-        return db.query(User).filter(User.email == email).first()
+        return db.query(User).filter(
+            User.email == email,
+            User.is_deleted == 0
+        ).first()
 
     def create(self, db: Session, *, obj_in: Dict[str, Any]) -> User:
         """
         Creates a user from a dict payload (used by /auth/register and /users/).
         Expects keys: email, password, name/full_name, role, organization.
         """
+        # Validate required fields
+        required_fields = ["email", "password"]
+        for field in required_fields:
+            if not obj_in.get(field):
+                raise ValueError(f"Missing required field: {field}")
+
         name = obj_in.get("name") or obj_in.get("full_name", "")
         org_name = obj_in.get("organization", "default")
 
@@ -26,7 +35,7 @@ class CRUDUser:
         if not org:
             org = Organization(
                 name=org_name,
-                legal_id=f"ORG-{org_name.upper()[:4]}-{int(datetime.utcnow().timestamp())}"
+                legal_id=f"ORG-{org_name.upper()[:4]}-{int(datetime.now(timezone.utc).timestamp())}"
             )
             db.add(org)
             db.commit()
@@ -36,7 +45,7 @@ class CRUDUser:
         role_name = obj_in.get("role", "Employee")
         role = db.query(Role).filter(Role.name == role_name).first()
         if not role:
-            role = Role(name=role_name, permissions={})
+            role = Role(name=role_name, permissions=[])
             db.add(role)
             db.commit()
             db.refresh(role)
@@ -52,7 +61,8 @@ class CRUDUser:
             org_id=org_id,
             role_id=role.id,
             employee_id=f"EMP-{uuid.uuid4().hex[:6].upper()}",
-            is_active=1
+            is_active=1,
+            is_deleted=0,
         )
         db.add(db_obj)
         db.commit()

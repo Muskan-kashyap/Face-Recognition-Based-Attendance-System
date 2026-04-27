@@ -1,12 +1,17 @@
 import os
 import sys
+import secrets
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 from app.db.database import SessionLocal
 from app.db.models.all_models import Role, Organization, User
-from app.core.security import hash_password
+from app.core.security import get_password_hash
 from sqlalchemy import text
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 def seed_db():
     db = SessionLocal()
@@ -18,7 +23,7 @@ def seed_db():
         db.execute(text('CREATE EXTENSION IF NOT EXISTS pgcrypto;'))
         db.commit()
     except Exception as e:
-        print(f"Failed to create extensions (might require superuser): {e}")
+        logger.warning(f"Failed to create extensions (might require superuser): {e}")
         db.rollback()
 
     # 1. Create Roles
@@ -26,7 +31,7 @@ def seed_db():
     for r_name in roles:
         role = db.query(Role).filter(Role.name == r_name).first()
         if not role:
-            role = Role(name=r_name)
+            role = Role(name=r_name, permissions=[])
             db.add(role)
     db.commit()
 
@@ -47,6 +52,8 @@ def seed_db():
     # 3. Create Super Admin User
     admin = db.query(User).filter(User.username == "admin").first()
     if not admin:
+        # Generate or use env var for seed password
+        seed_password = os.getenv("SEED_ADMIN_PASSWORD", secrets.token_urlsafe(16))
         admin = User(
             org_id=org.id,
             role_id=admin_role.id,
@@ -54,12 +61,15 @@ def seed_db():
             username="admin",
             email="admin@example.com",
             employee_id="ADM-001",
-            hashed_password=hash_password("admin123"), # Default password
+            hashed_password=get_password_hash(seed_password),
+            is_active=1,
+            is_deleted=0,
         )
         db.add(admin)
         db.commit()
+        logger.info(f"Created admin user with auto-generated password: {seed_password}")
 
-    print("Database seeding completed.")
+    logger.info("Database seeding completed.")
     db.close()
 
 if __name__ == "__main__":

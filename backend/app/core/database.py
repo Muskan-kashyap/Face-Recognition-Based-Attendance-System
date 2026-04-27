@@ -11,7 +11,20 @@ from sqlalchemy.ext.asyncio import (AsyncConnection, AsyncEngine, AsyncSession,
 from sqlalchemy.pool import NullPool
 from app.core.config import settings
 
+import os
+from urllib.parse import quote_plus
+from sqlalchemy import create_all, create_engine
 logger = logging.getLogger(__name__)
+# 1. Get the raw password from environment
+raw_password = os.getenv("DB_PASSWORD")
+
+# 2. URL-encode the password to handle the '@' symbol
+safe_password = quote_plus(raw_password)
+
+# 3. Construct the URL using the safe password
+SQLALCHEMY_DATABASE_URL = f"postgresql://{os.getenv('DB_USER')}:{safe_password}@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}"
+
+engine = create_engine(SQLALCHEMY_DATABASE_URL)
 
 engine: AsyncEngine = create_async_engine(
     settings.ASYNC_DATABASE_URL,

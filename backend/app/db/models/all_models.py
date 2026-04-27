@@ -1,12 +1,12 @@
 # =============================================================================
 #  db/models/all_models.py
-#  All 11 SQLAlchemy models in one file — zero circular import risk.
+#  All SQLAlchemy models in one file — zero circular import risk.
 #  Individual model files import from here via __init__.py
 # =============================================================================
 from __future__ import annotations
 
 import uuid
-from datetime import datetime, time
+from datetime import datetime, time, timezone
 from typing import List, Optional
 
 from pgvector.sqlalchemy import Vector
@@ -17,6 +17,11 @@ from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.models.base import Base, NVARCHAR
+
+
+def _utc_now() -> datetime:
+    """Return timezone-aware UTC datetime for model defaults."""
+    return datetime.now(timezone.utc)
 
 
 # ── Role ──────────────────────────────────────────────────────────────────────
@@ -41,10 +46,12 @@ class Organization(Base):
     blockchain_root_key: Mapped[Optional[str]] = mapped_column(NVARCHAR(255), nullable=True)
     zkp_threshold: Mapped[float] = mapped_column(Numeric(4, 2), nullable=False,
                                                   server_default=text("0.98"))
+    # NOTE: Using Integer(0/1) for booleans to avoid schema migration.
+    # Future: migrate to Boolean with Alembic.
     is_active: Mapped[int] = mapped_column(Integer, nullable=False, default=1,
                                             server_default=text("1"))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False,
-                                                  default=datetime.utcnow, server_default=text("NOW()"))
+                                                  default=_utc_now, server_default=text("NOW()"))
     api_keys:    Mapped[List["OrgApiKey"]]  = relationship("OrgApiKey",  back_populates="organization",
                                                             cascade="all, delete-orphan")
     departments: Mapped[List["Department"]] = relationship("Department", back_populates="organization")
@@ -68,7 +75,7 @@ class OrgApiKey(Base):
     is_revoked: Mapped[int] = mapped_column(Integer, nullable=False, default=0,
                                              server_default=text("0"))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False,
-                                                  default=datetime.utcnow, server_default=text("NOW()"))
+                                                  default=_utc_now, server_default=text("NOW()"))
     organization: Mapped["Organization"] = relationship("Organization", back_populates="api_keys")
     offline_sync_queue: Mapped[List["OfflineSyncQueue"]] = relationship(
         "OfflineSyncQueue", back_populates="api_key")
@@ -92,7 +99,7 @@ class Department(Base):
                                              server_default=text("0"),
                                              comment="0=active, 1=soft-deleted")
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False,
-                                                  default=datetime.utcnow, server_default=text("NOW()"))
+                                                  default=_utc_now, server_default=text("NOW()"))
     organization: Mapped["Organization"] = relationship("Organization", back_populates="departments")
     users: Mapped[List["User"]] = relationship("User", back_populates="department")
     __table_args__ = (
@@ -120,7 +127,7 @@ class Shift(Base):
     is_deleted: Mapped[int] = mapped_column(Integer, nullable=False, default=0,
                                              server_default=text("0"))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False,
-                                                  default=datetime.utcnow, server_default=text("NOW()"))
+                                                  default=_utc_now, server_default=text("NOW()"))
     organization: Mapped["Organization"] = relationship("Organization", back_populates="shifts")
     users: Mapped[List["User"]] = relationship("User", back_populates="shift")
     __table_args__ = (
@@ -172,7 +179,7 @@ class User(Base):
                                             server_default=text("1"),
                                             comment="1=active 0=suspended")
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False,
-                                                  default=datetime.utcnow, server_default=text("NOW()"))
+                                                  default=_utc_now, server_default=text("NOW()"))
     organization: Mapped["Organization"] = relationship("Organization", back_populates="users",
                                                          foreign_keys=[org_id])
     role: Mapped["Role"] = relationship("Role", back_populates="users", foreign_keys=[role_id])
@@ -191,7 +198,7 @@ class User(Base):
     monthly_summaries: Mapped[List["MonthlyGrowthSummary"]] = relationship(
         "MonthlyGrowthSummary", back_populates="user")
     tickets: Mapped[List["Ticket"]] = relationship("Ticket", back_populates="user")
-    reimbursements: Mapped[List["Reimbursement"]] = relationship("Reimbursement", back_populates="user")
+    reimbursements: Mapped[List["Reimbursement"]] = relationship("Reimbursement", back_populates="user", foreign_keys="Reimbursement.user_id")
     payrolls: Mapped[List["Payroll"]] = relationship("Payroll", back_populates="user")
     __table_args__ = (
         CheckConstraint("is_deleted IN (0, 1)", name="ck_users_is_deleted"),
@@ -219,7 +226,7 @@ class FaceEmbedding(Base):
                                             server_default=text("1"),
                                             comment="1=current 0=superseded by re-enrollment")
     enrolled_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False,
-                                                   default=datetime.utcnow, server_default=text("NOW()"))
+                                                   default=_utc_now, server_default=text("NOW()"))
     user: Mapped["User"] = relationship("User", back_populates="face_embedding")
     __table_args__ = (
         CheckConstraint("is_active IN (0, 1)", name="ck_face_embed_is_active"),
@@ -236,7 +243,7 @@ class AttendanceLog(Base):
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id", ondelete="RESTRICT"),
                                           nullable=False, index=True)
     check_in: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False,
-                                                default=datetime.utcnow, server_default=text("NOW()"),
+                                                default=_utc_now, server_default=text("NOW()"),
                                                 index=True)
     check_out: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True,
                                                            comment="NULL until clock-out")
@@ -258,7 +265,7 @@ class AttendanceLog(Base):
     is_deleted: Mapped[int] = mapped_column(Integer, nullable=False, default=0,
                                              server_default=text("0"))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False,
-                                                  default=datetime.utcnow, server_default=text("NOW()"))
+                                                  default=_utc_now, server_default=text("NOW()"))
     user: Mapped["User"] = relationship("User", back_populates="attendance_logs",
                                          foreign_keys=[user_id])
     manual_override: Mapped[Optional["ManualOverride"]] = relationship(
@@ -296,7 +303,7 @@ class ManualOverride(Base):
                                                     comment="0=pending ZKP approval 1=approved")
     approved_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False,
-                                                  default=datetime.utcnow, server_default=text("NOW()"))
+                                                  default=_utc_now, server_default=text("NOW()"))
     target_user: Mapped["User"] = relationship("User", back_populates="manual_overrides_as_target",
                                                 foreign_keys=[target_user_id])
     admin_user: Mapped["User"] = relationship("User", back_populates="manual_overrides_as_admin",
@@ -327,7 +334,7 @@ class BlockchainAuditLog(Base):
     tx_hash: Mapped[Optional[str]] = mapped_column(NVARCHAR(128), nullable=True)
     block_number: Mapped[Optional[int]] = mapped_column(BigInteger, nullable=True)
     anchored_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False,
-                                                   default=datetime.utcnow, server_default=text("NOW()"),
+                                                   default=_utc_now, server_default=text("NOW()"),
                                                    index=True)
     __table_args__ = (
         Index("ix_blockchain_ref", "ref_type", "ref_id"),
@@ -356,7 +363,7 @@ class MonthlyGrowthSummary(Base):
     productivity_score: Mapped[Optional[float]] = mapped_column(Numeric(5, 2), nullable=True)
     growth_index: Mapped[Optional[float]] = mapped_column(Numeric(6, 2), nullable=True)
     computed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False,
-                                                   default=datetime.utcnow, server_default=text("NOW()"))
+                                                   default=_utc_now, server_default=text("NOW()"))
     user: Mapped["User"] = relationship("User", back_populates="monthly_summaries")
     __table_args__ = (
         UniqueConstraint("user_id", "month_year", name="uq_monthly_user_month"),
@@ -406,11 +413,11 @@ class Ticket(Base):
                                            server_default=text("'medium'"),
                                            comment="low|medium|high|critical")
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False,
-                                                  default=datetime.utcnow, server_default=text("NOW()"))
+                                                  default=_utc_now, server_default=text("NOW()"))
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False,
-                                                  default=datetime.utcnow, onupdate=datetime.utcnow,
+                                                  default=_utc_now, onupdate=_utc_now,
                                                   server_default=text("NOW()"))
-    
+
     user: Mapped["User"] = relationship("User", back_populates="tickets")
     organization: Mapped["Organization"] = relationship("Organization")
 
@@ -436,7 +443,7 @@ class Reimbursement(Base):
     receipt_url: Mapped[Optional[str]] = mapped_column(NVARCHAR(512), nullable=True)
     approved_by: Mapped[Optional[int]] = mapped_column(Integer, ForeignKey("users.id"), nullable=True)
     submitted_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False,
-                                                    default=datetime.utcnow, server_default=text("NOW()"))
+                                                    default=_utc_now, server_default=text("NOW()"))
     processed_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
 
     user: Mapped["User"] = relationship("User", back_populates="reimbursements", foreign_keys=[user_id])
@@ -465,7 +472,7 @@ class Payroll(Base):
                                          server_default=text("'draft'"),
                                          comment="draft|pending|paid")
     generated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False,
-                                                    default=datetime.utcnow, server_default=text("NOW()"))
+                                                    default=_utc_now, server_default=text("NOW()"))
 
     user: Mapped["User"] = relationship("User", back_populates="payrolls")
 
@@ -473,3 +480,4 @@ class Payroll(Base):
         CheckConstraint("status IN ('draft','pending','paid')", name="ck_payroll_status"),
         UniqueConstraint("user_id", "month", "year", name="uq_user_monthly_payroll"),
     )
+

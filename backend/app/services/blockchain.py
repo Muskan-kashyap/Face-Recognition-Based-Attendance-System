@@ -5,6 +5,31 @@ from typing import Optional, Dict, Any
 from web3 import Web3
 from app.core.config import settings
 
+
+async def background_blockchain_anchor(ref_id: int, payload: dict, ref_type: str):
+    """
+    Background blockchain anchoring with isolated DB session.
+    DRY: Shared across all routers to avoid code duplication.
+    """
+    from app.db.database import SessionLocal
+    from app.db.models.all_models import BlockchainAuditLog
+    db = SessionLocal()
+    try:
+        tx_hash = blockchain_service.anchor_record(ref_id, ref_type, payload)
+        audit = BlockchainAuditLog(
+            ref_id=ref_id,
+            ref_type=ref_type,
+            record_hash=blockchain_service.generate_record_hash(payload),
+            tx_hash=tx_hash
+        )
+        db.add(audit)
+        db.commit()
+    except Exception:
+        db.rollback()
+    finally:
+        db.close()
+
+
 class BlockchainService:
     def __init__(self):
         # In a real 2026 scenario, this would connect to a sidechain like Polygon or Arbitrum

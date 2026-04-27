@@ -1,40 +1,64 @@
 import functools
+import hashlib
 import json
+import logging
 from typing import Any, Optional
 from diskcache import Cache
 from app.core.config import settings
 
-# In a real 2026 prod env, this would be Redis. 
+logger = logging.getLogger(__name__)
+
+# In a real 2026 prod env, this would be Redis.
 # DiskCache is a high-performance alternative for edge/local deployments.
-cache = Cache("/tmp/visioncore_cache")
+cache = Cache(settings.CACHE_DIR if hasattr(settings, 'CACHE_DIR') else "/tmp/visioncore_cache")
+
+
+def _make_cache_key(func_name: str, args: tuple, kwargs: dict) -> str:
+    """Create a deterministic, safe cache key from function call arguments."""
+    try:
+        key_data = f"{func_name}:{json.dumps(args, sort_keys=True, default=str)}:{json.dumps(kwargs, sort_keys=True, default=str)}"
+    except (TypeError, ValueError):
+        key_data = f"{func_name}:{id(args)}:{id(kwargs)}"
+    return hashlib.sha256(key_data.encode()).hexdigest()
+
 
 def cache_response(expire: int = 60):
     """
     Decorator to cache API responses.
+    Only caches JSON-serializable responses (dicts, lists, primitives).
     """
     def decorator(func):
         @functools.wraps(func)
         async def wrapper(*args, **kwargs):
-            # Create a unique key based on function name and arguments
-            key = f"{func.__name__}:{args}:{kwargs}"
-            result = cache.get(key)
-            
-            if result is not None:
-                return json.loads(result)
-            
-            # Execute the function
+            key = _make_cache_key(func.__name__, args, kwargs)
+            try:
+                result = cache.get(key)
+                if result is not None:
+                    return json.loads(result)
+            except Exception as e:
+                logger.warning("Cache read error for key %s: %s", key, e)
+
             response = await func(*args, **kwargs)
-            
-            # Store in cache
-            cache.set(key, json.dumps(response), expire=expire)
+
+            try:
+                serialized = json.dumps(response)
+                cache.set(key, serialized, expire=expire)
+            except (TypeError, ValueError):
+                pass  # Non-serializable response; skip caching
+
             return response
         return wrapper
     return decorator
+
 
 def invalidate_cache(key_prefix: str):
     """
     Clear cache keys starting with a prefix.
     """
-    for key in cache.iterkeys():
-        if key.startswith(key_prefix):
-            cache.delete(key)
+    try:
+        for key in cache.iterkeys():
+            if key.startswith(key_prefix):
+                cache.delete(key)
+    except Exception as e:
+        logger.warning("Cache invalidation error for prefix %s: %s", key_prefix, e)
+
