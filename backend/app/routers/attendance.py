@@ -1,13 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks, Query
 from sqlalchemy.orm import Session
 from datetime import datetime
-from typing import Any, List
+from typing import Any, List, Optional
 import base64
 import logging
 
 from app.crud.crud_attendance import attendance as crud_attendance
-from app.schema.attendance import CheckInRequest, AttendanceLogResponse
-from app.db.database import get_db
+from app.schema.attendance import CheckInRequest, CheckOutRequest, AttendanceLogResponse
+from app.db.session import get_db
 from app.api import deps
 from app.db.models.all_models import User, AttendanceLog
 from app.services.analytics import analytics_service
@@ -49,9 +49,9 @@ def get_logs(
     current_user: User = Depends(deps.get_current_active_user),
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=500),
-    status: str = Query(None),
-    date_from: datetime = Query(None),
-    date_to: datetime = Query(None),
+    status: Optional[str] = Query(None),
+    date_from: Optional[datetime] = Query(None),
+    date_to: Optional[datetime] = Query(None),
 ) -> Any:
     """
     Get attendance logs with pagination and optional filtering.
@@ -60,6 +60,12 @@ def get_logs(
         User.org_id == current_user.org_id,
         AttendanceLog.is_deleted == 0
     )
+    
+    # STRICT RBAC: Employees only see their own logs
+    user_role = current_user.role.name.lower()
+    if user_role == "employee":
+        query = query.filter(AttendanceLog.user_id == current_user.id)
+
     if status:
         query = query.filter(AttendanceLog.status == status)
     if date_from:
@@ -116,7 +122,8 @@ async def check_in(
         raise HTTPException(status_code=400, detail="User identification required")
 
     # SECURE: Prevent check-in spoofing — users can only clock in as themselves
-    if current_user.role.name not in ["Admin", "Manager"] and req.user_id != current_user.id:
+    user_role = current_user.role.name.lower()
+    if user_role == "employee" and req.user_id != current_user.id:
         raise HTTPException(status_code=403, detail="You can only check in for yourself")
 
     # 2. Logic Branch: Shift Status
@@ -147,17 +154,45 @@ async def check_in(
     return log
 
 
+@router.post("/check-out", response_model=AttendanceLogResponse)
+def check_out(
+    *,
+    db: Session = Depends(get_db),
+    req: CheckOutRequest,
+    current_user: User = Depends(deps.get_current_active_user),
+) -> Any:
+    """
+    Check-out: updates the most recent open attendance log for the user.
+    """
+    # SECURE: Users can only check out for themselves unless Admin/Manager
+    user_role = current_user.role.name.lower()
+    if user_role == "employee" and req.user_id != current_user.id:
+        raise HTTPException(status_code=403, detail="You can only check out for yourself")
+
+    log = db.query(AttendanceLog).filter(
+        AttendanceLog.user_id == req.user_id,
+        AttendanceLog.check_out == None,
+        AttendanceLog.is_deleted == 0
+    ).order_by(AttendanceLog.check_in.desc()).first()
+
+    if not log:
+        raise HTTPException(status_code=404, detail="No active check-in found")
+
+    log.check_out = req.timestamp
+    db.commit()
+    db.refresh(log)
+    return log
+
+
 @router.patch("/logs/{log_id}", response_model=AttendanceLogResponse)
 def update_attendance_log(
     *,
     db: Session = Depends(get_db),
     log_id: int,
     status: str,
-    current_user: User = Depends(deps.get_current_active_user),
+    current_user: User = Depends(deps.require_role(["manager"])),
     background_tasks: BackgroundTasks
 ) -> Any:
-    if current_user.role.name not in ["Admin", "Manager"]:
-        raise HTTPException(status_code=403, detail="Unauthorized")
 
     # SECURE: Ensure the log belongs to the admin's organization
     log = db.query(AttendanceLog).join(User).filter(

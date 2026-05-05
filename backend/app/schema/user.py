@@ -39,6 +39,20 @@ class RoleOut(BaseModel):
         from_attributes = True
 
 
+# NEW: Minimal user for login response (PHASE 1)
+class LoginUserResponse(BaseModel):
+    id: int
+    email: str
+    role: str
+
+
+# NEW: Login response contract (PHASE 1)
+class LoginResponse(BaseModel):
+    access_token: str
+    refresh_token: str
+    user: LoginUserResponse
+
+
 class UserResponse(BaseModel):
     id: int
     full_name: str

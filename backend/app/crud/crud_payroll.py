@@ -1,9 +1,10 @@
+import uuid
 from sqlalchemy.orm import Session
 from app.db.models.all_models import Payroll
 from app.schema.payroll import PayrollCreate, PayrollUpdate
 
 class CRUDPayroll:
-    def create(self, db: Session, *, obj_in: PayrollCreate, org_id: str) -> Payroll:
+    def create(self, db: Session, *, obj_in: PayrollCreate, org_id: uuid.UUID) -> Payroll:
         db_obj = Payroll(
             user_id=obj_in.user_id,
             org_id=org_id,
@@ -20,7 +21,7 @@ class CRUDPayroll:
         db.refresh(db_obj)
         return db_obj
 
-    def get_multi_by_org(self, db: Session, *, org_id: str, month: int = None, year: int = None):
+    def get_multi_by_org(self, db: Session, *, org_id: uuid.UUID, month: int = None, year: int = None):
         query = db.query(Payroll).filter(Payroll.org_id == org_id)
         if month:
             query = query.filter(Payroll.month == month)

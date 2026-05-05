@@ -48,7 +48,21 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         db.refresh(db_obj)
         return db_obj
 
-    def remove(self, db: Session, *, id: int) -> ModelType:
+    def remove(self, db: Session, *, id: int) -> Optional[ModelType]:
+        """Soft delete: set is_deleted=1 if column exists, else hard delete."""
+        obj = db.query(self.model).get(id)
+        if not obj:
+            return None
+        if hasattr(obj, "is_deleted"):
+            obj.is_deleted = 1
+        else:
+            db.delete(obj)
+        db.commit()
+        db.refresh(obj)
+        return obj
+
+    def hard_remove(self, db: Session, *, id: int) -> Optional[ModelType]:
+        """Hard delete — use only for GDPR/purge workflows."""
         obj = db.query(self.model).get(id)
         if obj:
             db.delete(obj)

@@ -1,4 +1,4 @@
-from typing import Any, List
+from typing import Any, List, Optional
 from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 from sqlalchemy.orm import Session
 from sqlalchemy import func
@@ -6,40 +6,23 @@ from sqlalchemy import func
 from app.crud.crud_payroll import payroll as crud_payroll
 from app.api import deps
 from app.schema.payroll import PayrollResponse, PayrollCreate, PayrollUpdate
-from app.db.models.all_models import User, Payroll, Reimbursement, AttendanceLog, BlockchainAuditLog
-from app.db.database import get_db, SessionLocal
-from app.services.blockchain import blockchain_service
+from app.db.models.all_models import User, Payroll, Reimbursement, AttendanceLog
+from app.db.session import get_db
+from app.services.blockchain import background_blockchain_anchor
 
 router = APIRouter()
-
-
-async def background_blockchain_anchor(ref_id: int, payload: dict, ref_type: str):
-    """Background blockchain anchoring with isolated DB session."""
-    db = SessionLocal()
-    try:
-        tx_hash = blockchain_service.anchor_record(ref_id, ref_type, payload)
-        audit = BlockchainAuditLog(
-            ref_id=ref_id,
-            ref_type=ref_type,
-            record_hash=blockchain_service.generate_record_hash(payload),
-            tx_hash=tx_hash
-        )
-        db.add(audit)
-        db.commit()
-    except Exception:
-        db.rollback()
-    finally:
-        db.close()
 
 
 @router.get("/", response_model=List[PayrollResponse])
 def read_payrolls(
     db: Session = Depends(get_db),
-    month: int = None,
-    year: int = None,
+    month: Optional[int] = None,
+    year: Optional[int] = None,
     current_user: User = Depends(deps.get_current_active_user),
 ) -> Any:
-    if current_user.role.name not in ["Admin", "Manager"]:
+    # Employees see only their own, Managers/Admins see org-wide
+    user_role = current_user.role.name.lower()
+    if user_role in ["employee"]:
         return db.query(Payroll).filter(Payroll.user_id == current_user.id).all()
     return crud_payroll.get_multi_by_org(db, org_id=current_user.org_id, month=month, year=year)
 
@@ -48,16 +31,17 @@ def read_payrolls(
 async def generate_payroll(
     *,
     db: Session = Depends(get_db),
-    month: int,
-    year: int,
-    current_user: User = Depends(deps.get_current_active_user),
+    payload: PayrollCreate,
+    current_user: User = Depends(deps.require_role(["manager"])), # Hierarchy: manager, admin, superadmin
     background_tasks: BackgroundTasks
 ) -> Any:
     """
     OPTIMIZED: Single query approach to avoid N+1 bottlenecks.
+    Accepts JSON body with month and year.
     """
-    if current_user.role.name not in ["Admin", "Manager"]:
-        raise HTTPException(status_code=403, detail="Forbidden")
+
+    month = payload.month
+    year = payload.year
 
     # 1. Bulk fetch deductions
     late_counts = db.query(
@@ -118,11 +102,9 @@ def update_payroll_status(
     db: Session = Depends(get_db),
     payroll_id: int,
     status_in: PayrollUpdate,
-    current_user: User = Depends(deps.get_current_active_user),
+    current_user: User = Depends(deps.require_role(["manager"])),
     background_tasks: BackgroundTasks
 ) -> Any:
-    if current_user.role.name not in ["Admin", "Manager"]:
-        raise HTTPException(status_code=403, detail="Forbidden")
 
     # SECURE: Filter by org_id
     payroll_obj = db.query(Payroll).filter(
@@ -136,7 +118,5 @@ def update_payroll_status(
     updated = crud_payroll.update(db, db_obj=payroll_obj, obj_in=status_in)
     payload = {"id": updated.id, "status": updated.status, "by": current_user.username}
     background_tasks.add_task(background_blockchain_anchor, updated.id, payload, "payroll")
-    db.commit()
 
     return updated
-

@@ -11,7 +11,7 @@ from sqlalchemy import pool
 from alembic import context
 from app.db.models.base import Base
 import app.db.models.all_models  # Ensure models are loaded
-from app.db.database import SQLALCHEMY_DATABASE_URL
+from app.db.session import SQLALCHEMY_DATABASE_URL
 
 config = context.config
 config.set_main_option("sqlalchemy.url", SQLALCHEMY_DATABASE_URL.replace("%", "%%"))

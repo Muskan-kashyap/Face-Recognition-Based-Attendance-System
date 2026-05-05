@@ -9,6 +9,7 @@ export default function SignupPage() {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [isSuccess, setIsSuccess] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -55,8 +56,13 @@ export default function SignupPage() {
         department: formData.department || undefined,
         city: formData.city || undefined,
       };
+
       await authService.register(payload);
-      navigate("/login");
+      setIsSuccess(true);
+      setTimeout(() => {
+        navigate("/login");
+      }, 2000);
+
     } catch (err) {
       setError(err.response?.data?.detail || "Registration failed. Please try again.");
     } finally {
@@ -107,6 +113,23 @@ export default function SignupPage() {
               />
             </div>
           </div>
+
+          {/* Success */}
+          {isSuccess && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              className="mb-6 rounded-lg bg-emerald-500/10 border border-emerald-500/20 p-4 text-sm text-emerald-400 font-medium flex items-center"
+            >
+              <span className="mr-2">✓</span> Registration successful! Redirecting to login...
+            </motion.div>
+          )}
+          {/* {isSuccess && (
+            <div className="mb-6 rounded-lg bg-emerald-500/10 border border-emerald-500/20 p-4 text-sm text-emerald-400 font-medium">
+              🎉 Account created! Redirecting to login...
+            </div>
+          )} */}
 
           {/* Error */}
           <AnimatePresence mode="wait">
@@ -174,11 +197,10 @@ export default function SignupPage() {
                             {[0, 1, 2, 3].map((i) => (
                               <div
                                 key={i}
-                                className={`flex-1 rounded-full transition-colors duration-300 ${
-                                  i < strength
-                                    ? strengthColors[strength - 1]
-                                    : "bg-gray-700"
-                                }`}
+                                className={`flex-1 rounded-full transition-colors duration-300 ${i < strength
+                                  ? strengthColors[strength - 1]
+                                  : "bg-gray-700"
+                                  }`}
                               />
                             ))}
                           </div>

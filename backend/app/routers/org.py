@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.crud.crud_org import organization as crud_org
 from app.schema.org import OrganizationResponse, OrganizationCreate
-from app.db.database import get_db
+from app.db.session import get_db
 from app.api import deps
 from app.db.models.all_models import User
 
@@ -14,13 +14,8 @@ def create_organization(
     *,
     db: Session = Depends(get_db),
     org_in: OrganizationCreate,
-    current_user: User = Depends(deps.get_current_active_user),
+    current_user: User = Depends(deps.require_role(["admin"])),
 ):
-    """
-    Create a new organization (Tenant).
-    """
-    if current_user.role.name != "Admin":
-         raise HTTPException(status_code=403, detail="Not enough permissions")
          
     org = crud_org.get_by_legal_id(db, legal_id=org_in.legal_id)
     if org:

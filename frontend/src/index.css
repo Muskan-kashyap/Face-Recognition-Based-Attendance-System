@@ -95,19 +95,46 @@
   --animate-slide-up: slideUp 0.5s ease-out forwards;
 
   @keyframes fadeIn {
-    0% { opacity: 0; }
-    100% { opacity: 1; }
+    0% {
+      opacity: 0;
+    }
+
+    100% {
+      opacity: 1;
+    }
   }
+
   @keyframes slideUp {
-    0% { opacity: 0; transform: translateY(20px); }
-    100% { opacity: 1; transform: translateY(0); }
+    0% {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
+}
+
+:root {
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  /* Light glass */
+  --glass-border: rgba(0, 0, 0, 0.1);
+}
+
+.dark {
+  --glass-bg: rgba(15, 23, 42, 0.65);
+  /* Dark glass */
+  --glass-border: rgba(255, 255, 255, 0.05);
 }
 
 @layer base {
   :root {
     --glass-bg: rgba(15, 23, 42, 0.65);
     --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-bg: rgba(255, 255, 255, 0.7);
+    --glass-border: rgba(0, 0, 0, 0.1);
   }
 
   html {
@@ -143,6 +170,7 @@
   .hide-scrollbar::-webkit-scrollbar {
     display: none;
   }
+
   .hide-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
@@ -151,8 +179,15 @@
 
 /* Animations */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .animate-fade-in {
@@ -160,8 +195,15 @@
 }
 
 @keyframes slideInRight {
-  from { opacity: 0; transform: translateX(16px); }
-  to { opacity: 1; transform: translateX(0); }
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 .animate-slide-in-right {
@@ -185,14 +227,44 @@
   width: 6px;
   height: 6px;
 }
+
 ::-webkit-scrollbar-track {
   background: transparent;
 }
+
 ::-webkit-scrollbar-thumb {
   background: #334155;
   border-radius: 9999px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
   background: #475569;
 }
 
+input,
+select,
+textarea {
+  background-color: #f8fafc !important;
+  /* bg-slate-50 */
+  color: #0f172a !important;
+  /* text-slate-900 */
+  border-color: #e2e8f0 !important;
+  /* border-slate-200 */
+}
+
+/* When dark mode is active on the body */
+.dark input,
+.dark select,
+.dark textarea {
+  background-color: #1f2937 !important;
+  /* bg-gray-800 */
+  color: #f9fafb !important;
+  /* text-white */
+  border-color: #374151 !important;
+  /* border-gray-700 */
+}
+
+input::placeholder {
+  color: #94a3b8 !important;
+  /* placeholder-slate-400 */
+}

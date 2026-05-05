@@ -22,8 +22,8 @@ def rate_limit_dependency(max_requests: int = 5, window_seconds: int = 60):
         key = f"rate_limit:{request.url.path}:{client_ip}"
         
         # Redis pipeline for atomic transaction
-        async with redis_client.pipeline(transaction=True) as pipe:
-            try:
+        try:
+            async with redis_client.pipeline(transaction=True) as pipe:
                 # Increment the counter
                 pipe.incr(key)
                 # Set expiry if it's the first request
@@ -37,12 +37,11 @@ def rate_limit_dependency(max_requests: int = 5, window_seconds: int = 60):
                     logger.warning("Rate limit exceeded for %s on %s", client_ip, request.url.path)
                     raise HTTPException(status_code=429, detail="Too many requests. Please try again later.")
                 
-            except redis_async.RedisError as e:
-                logger.error(f"Redis rate limiter error: {e}")
-                # Fail open to not block legitimate requests if Redis goes down, or fail closed
-                # Here we will fail open but log the error
-                pass
+        except redis_async.RedisError as e:
+            # Fail OPEN when Redis is unavailable - allow requests to proceed
+            # This prevents blocking login when Redis is down
+            logger.warning(f"Redis unavailable, skipping rate limit for {request.url.path} (client: {client_ip}): {e}")
+            return True  # Allow the request to pass through
                 
         return True
     return _check
-

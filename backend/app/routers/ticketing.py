@@ -1,4 +1,4 @@
-from typing import Any, List
+from typing import Any, List, Optional
 from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks, Query
 from sqlalchemy.orm import Session
 from datetime import datetime, timedelta, timezone
@@ -7,28 +7,11 @@ from app.crud.crud_ticket import ticket as crud_ticket
 from app.api import deps
 from app.schema.ticket import TicketResponse, TicketCreate, TicketUpdate
 from app.db.models.all_models import User, Ticket, BlockchainAuditLog
-from app.db.database import get_db, SessionLocal
-from app.services.blockchain import blockchain_service
+from app.db.session import get_db, SessionLocal
+from app.services.blockchain import blockchain_service, background_blockchain_anchor
 
 router = APIRouter()
 
-
-async def background_blockchain_anchor(ref_id: int, payload: dict, ref_type: str):
-    """Background blockchain anchoring with isolated DB session."""
-    db = SessionLocal()
-    try:
-        tx_hash = blockchain_service.anchor_record(ref_id, ref_type, payload)
-        audit = BlockchainAuditLog(
-            ref_id=ref_id, ref_type=ref_type,
-            record_hash=blockchain_service.generate_record_hash(payload),
-            tx_hash=tx_hash
-        )
-        db.add(audit)
-        db.commit()
-    except Exception:
-        db.rollback()
-    finally:
-        db.close()
 
 
 async def escalate_tickets_job():
@@ -57,7 +40,8 @@ def read_tickets(
     current_user: User = Depends(deps.get_current_active_user),
 ) -> Any:
     query = db.query(Ticket).filter(Ticket.org_id == current_user.org_id)
-    if current_user.role.name not in ["Admin", "Manager"]:
+    user_role = current_user.role.name.lower()
+    if user_role == "employee":
         query = query.filter(Ticket.user_id == current_user.id)
     if status:
         query = query.filter(Ticket.status == status)
@@ -92,7 +76,9 @@ def update_ticket(
     if not ticket_obj:
         raise HTTPException(status_code=404, detail="Ticket not found")
 
-    if current_user.role.name not in ["Admin", "Manager"] and ticket_obj.user_id != current_user.id:
+    # Role check: only Admin/Manager or the ticket creator can update
+    user_role = current_user.role.name.lower()
+    if user_role == "employee" and ticket_obj.user_id != current_user.id:
         raise HTTPException(status_code=403, detail="Forbidden")
 
     updated = crud_ticket.update(db, db_obj=ticket_obj, obj_in=ticket_in)

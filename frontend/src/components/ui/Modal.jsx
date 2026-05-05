@@ -26,7 +26,7 @@ export const Modal = ({
       {/* Modal Content */}
       <div
         className={cn(
-          'relative w-full rounded-xl bg-gray-900 shadow-xl border border-gray-800 animate-fade-in',
+          'relative w-full rounded-xl bg-white dark:bg-gray-900 shadow-2xl border border-slate-200 dark:border-gray-800 animate-fade-in',
           className
         )}
       >
@@ -34,19 +34,19 @@ export const Modal = ({
           <div className="flex items-start justify-between p-6 pb-0">
             <div className="space-y-1">
               {title && (
-                <h3 className="text-lg font-semibold leading-none text-white">
+                <h3 className="text-lg font-semibold leading-none text-slate-900 dark:text-white">
                   {title}
                 </h3>
               )}
               {description && (
-                <p className="text-sm text-gray-400">{description}</p>
+                <p className="text-sm text-slate-500 dark:text-gray-400">{description}</p>
               )}
             </div>
 
             {showClose && (
               <button
                 onClick={onClose}
-                className="rounded-lg p-1 text-gray-400 hover:bg-gray-800 hover:text-white transition-colors duration-200"
+                className="rounded-lg p-1 text-slate-400 dark:text-gray-400 hover:bg-slate-100 dark:hover:bg-gray-800 hover:text-slate-900 dark:hover:text-white transition-colors duration-200"
               >
                 <X className="h-5 w-5" />
               </button>

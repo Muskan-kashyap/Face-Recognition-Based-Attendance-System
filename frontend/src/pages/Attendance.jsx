@@ -19,13 +19,6 @@ export default function Attendance() {
   const { user } = useAuthStore();
   const timeoutRef = useRef(null);
 
-  useEffect(() => {
-    fetchLogs();
-    return () => {
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    };
-  }, []);
-
   const fetchLogs = async () => {
     try {
       const res = await attendanceService.getLogs({ limit: 10 });
@@ -34,6 +27,13 @@ export default function Attendance() {
       // silent
     }
   };
+
+  useEffect(() => {
+    fetchLogs();
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, []);
 
   const reset = useCallback(() => {
     setStep('idle');

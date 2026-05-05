@@ -1,33 +1,15 @@
-from typing import Any, List
+from typing import Any, List, Optional
 from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks, Query
 from sqlalchemy.orm import Session
 
 from app.crud.crud_reimbursement import reimbursement as crud_reimbursement
 from app.api import deps
 from app.schema.reimbursement import ReimbursementResponse, ReimbursementCreate, ReimbursementUpdate
-from app.db.models.all_models import User, Reimbursement, BlockchainAuditLog
-from app.db.database import get_db, SessionLocal
-from app.services.blockchain import blockchain_service
+from app.db.models.all_models import User, Reimbursement
+from app.db.session import get_db
+from app.services.blockchain import background_blockchain_anchor
 
 router = APIRouter()
-
-
-async def background_blockchain_anchor(ref_id: int, payload: dict, ref_type: str):
-    """Background blockchain anchoring with isolated DB session."""
-    db = SessionLocal()
-    try:
-        tx_hash = blockchain_service.anchor_record(ref_id, ref_type, payload)
-        audit = BlockchainAuditLog(
-            ref_id=ref_id, ref_type=ref_type,
-            record_hash=blockchain_service.generate_record_hash(payload),
-            tx_hash=tx_hash
-        )
-        db.add(audit)
-        db.commit()
-    except Exception:
-        db.rollback()
-    finally:
-        db.close()
 
 
 @router.get("/", response_model=List[ReimbursementResponse])
@@ -35,11 +17,12 @@ def read_claims(
     db: Session = Depends(get_db),
     skip: int = 0,
     limit: int = 100,
-    status: str = Query(None),
+    status: Optional[str] = Query(None),
     current_user: User = Depends(deps.get_current_active_user),
 ) -> Any:
     query = db.query(Reimbursement).filter(Reimbursement.org_id == current_user.org_id)
-    if current_user.role.name not in ["Admin", "Manager"]:
+    user_role = current_user.role.name.lower()
+    if user_role == "employee":
         query = query.filter(Reimbursement.user_id == current_user.id)
     if status:
         query = query.filter(Reimbursement.status == status)
@@ -66,11 +49,9 @@ def approve_claim(
     db: Session = Depends(get_db),
     claim_id: int,
     claim_in: ReimbursementUpdate,
-    current_user: User = Depends(deps.get_current_active_user),
+    current_user: User = Depends(deps.require_role(["manager"])),
     background_tasks: BackgroundTasks
 ) -> Any:
-    if current_user.role.name not in ["Admin", "Manager"]:
-        raise HTTPException(status_code=403, detail="Forbidden")
 
     # SECURE: Filter by org_id
     claim_obj = db.query(Reimbursement).filter(Reimbursement.id == claim_id, Reimbursement.org_id == current_user.org_id).first()
@@ -81,4 +62,3 @@ def approve_claim(
     payload = {"id": updated.id, "status": updated.status, "by": current_user.username}
     background_tasks.add_task(background_blockchain_anchor, updated.id, payload, "reimbursement")
     return updated
-

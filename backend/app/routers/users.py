@@ -11,7 +11,7 @@ from app.crud.crud_user import user as crud_user
 from app.api import deps
 from app.schema.user import UserResponse, UserCreate, UserUpdate, FaceEnroll
 from app.db.models.all_models import User
-from app.db.database import get_db
+from app.db.session import get_db
 
 router = APIRouter()
 
@@ -21,11 +21,9 @@ def read_users(
     db: Session = Depends(get_db),
     skip: int = 0,
     limit: int = 100,
-    current_user: User = Depends(deps.get_current_active_user),
+    current_user: User = Depends(deps.require_role(["manager"])),
 ) -> Any:
     """STRICT MULTI-TENANCY: Admins only see users in their own org."""
-    if current_user.role.name not in ["Admin", "Manager"]:
-        raise HTTPException(status_code=403, detail="Unauthorized")
     return db.query(User).filter(
         User.org_id == current_user.org_id,
         User.is_deleted == 0
@@ -37,10 +35,8 @@ def create_user(
     *,
     db: Session = Depends(get_db),
     user_in: UserCreate,
-    current_user: User = Depends(deps.get_current_active_user),
+    current_user: User = Depends(deps.require_role(["manager"])),
 ) -> Any:
-    if current_user.role.name not in ["Admin", "Manager"]:
-        raise HTTPException(status_code=403, detail="Unauthorized")
 
     # Enforce org_id from the calling admin's session — prevents org spoofing
     user_in.org_id = current_user.org_id
@@ -78,7 +74,8 @@ def read_user_by_id(
     ).first()
     if not user:
         raise HTTPException(status_code=404, detail="Identity not found")
-    if current_user.id != user_id and current_user.role.name not in ["Admin", "Manager"]:
+    user_role = current_user.role.name.lower()
+    if current_user.id != user_id and user_role == "employee":
         raise HTTPException(status_code=403, detail="Forbidden")
     return user
 
@@ -98,7 +95,8 @@ def enroll_user_face(
     ).first()
     if not user:
         raise HTTPException(status_code=404, detail="Identity not found")
-    if current_user.role.name not in ["Admin", "Manager"] and current_user.id != user_id:
+    user_role = current_user.role.name.lower()
+    if user_role == "employee" and current_user.id != user_id:
         raise HTTPException(status_code=403, detail="Forbidden")
 
     crud_user.enroll_face(db, user_id=user_id, embedding=enroll_in.face_embedding)

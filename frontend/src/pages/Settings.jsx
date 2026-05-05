@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuthStore } from '../store/authStore';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
+import { useThemeStore } from '../store/themeStore';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Badge } from '../components/ui/Badge';
@@ -9,19 +10,19 @@ import { Bell, Shield, User, Building, Moon, Sun } from 'lucide-react';
 
 export default function Settings() {
   const { user } = useAuthStore();
-  const [theme, setTheme] = useState('dark');
+  const { theme, setTheme } = useThemeStore();
 
   return (
     <div className="space-y-8 max-w-3xl">
       <div>
-        <h1 className="text-2xl font-bold text-white">Settings</h1>
-        <p className="text-sm text-gray-400 mt-1">Manage your account and preferences</p>
+        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Settings</h1>
+        <p className="text-sm text-slate-500 dark:text-gray-400 mt-1">Manage your account and preferences</p>
       </div>
 
       {/* Profile */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-white">
+          <CardTitle className="flex items-center gap-2 text-slate-900 dark:text-white">
             <User className="h-5 w-5 text-indigo-400" />
             Profile
           </CardTitle>
@@ -30,8 +31,8 @@ export default function Settings() {
           <div className="flex items-center gap-4">
             <Avatar name={user?.full_name} size="lg" />
             <div>
-              <p className="text-base font-semibold text-white">{user?.full_name}</p>
-              <p className="text-sm text-gray-400">{user?.email}</p>
+              <p className="text-base font-semibold text-slate-900 dark:text-white">{user?.full_name}</p>
+              <p className="text-sm text-slate-500 dark:text-gray-400">{user?.email}</p>
               <Badge variant="primary" className="mt-1">{user?.role?.name}</Badge>
             </div>
           </div>
@@ -46,7 +47,7 @@ export default function Settings() {
       {/* Security */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-white">
+          <CardTitle className="flex items-center gap-2 text-slate-900 dark:text-white">
             <Shield className="h-5 w-5 text-indigo-400" />
             Security
           </CardTitle>
@@ -62,7 +63,7 @@ export default function Settings() {
       {/* Appearance */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-white">
+          <CardTitle className="flex items-center gap-2 text-slate-900 dark:text-white">
             <Moon className="h-5 w-5 text-indigo-400" />
             Appearance
           </CardTitle>
@@ -70,20 +71,20 @@ export default function Settings() {
         <CardContent>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-white">Interface theme</p>
-              <p className="text-xs text-gray-400">Choose between light and dark mode</p>
+              <p className="text-sm font-medium text-slate-900 dark:text-white">Interface theme</p>
+              <p className="text-xs text-slate-500 dark:text-gray-400">Choose between light and dark mode</p>
             </div>
-            <div className="flex bg-gray-800 rounded-lg p-1">
+            <div className="flex bg-slate-100 dark:bg-gray-800 rounded-lg p-1 border border-slate-200 dark:border-transparent">
               <button
                 onClick={() => setTheme('light')}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors duration-200 ${theme === 'light' ? 'bg-gray-700 text-white shadow-sm' : 'text-gray-400 hover:text-gray-200'}`}
+                className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all ${theme === 'light' ? 'bg-white text-indigo-600 shadow-sm border border-slate-200' : 'text-slate-500 hover:text-slate-900'}`}
               >
                 <Sun className="h-4 w-4" />
                 Light
               </button>
               <button
                 onClick={() => setTheme('dark')}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors duration-200 ${theme === 'dark' ? 'bg-gray-700 text-white shadow-sm' : 'text-gray-400 hover:text-gray-200'}`}
+                className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all ${theme === 'dark' ? 'bg-gray-700 text-white shadow-sm' : 'text-gray-400 hover:text-gray-200'}`}
               >
                 <Moon className="h-4 w-4" />
                 Dark
@@ -96,7 +97,7 @@ export default function Settings() {
       {/* Organization */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-white">
+          <CardTitle className="flex items-center gap-2 text-slate-900 dark:text-white">
             <Building className="h-5 w-5 text-indigo-400" />
             Organization
           </CardTitle>

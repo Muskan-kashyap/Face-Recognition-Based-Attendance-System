@@ -11,7 +11,7 @@ async def background_blockchain_anchor(ref_id: int, payload: dict, ref_type: str
     Background blockchain anchoring with isolated DB session.
     DRY: Shared across all routers to avoid code duplication.
     """
-    from app.db.database import SessionLocal
+    from app.db.session import SessionLocal
     from app.db.models.all_models import BlockchainAuditLog
     db = SessionLocal()
     try:

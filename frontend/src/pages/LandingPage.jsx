@@ -39,11 +39,10 @@ const PricingCard = ({ name, price, description, features, featured }) => (
     whileInView={{ opacity: 1, y: 0 }}
     viewport={{ once: true }}
     transition={{ duration: 0.5 }}
-    className={`relative rounded-2xl border p-8 flex flex-col overflow-hidden transition-all duration-300 hover:scale-105 ${
-      featured
-        ? "bg-indigo-500/10 border-indigo-500 scale-105 shadow-xl shadow-indigo-500/20 z-10"
-        : "bg-gray-900 border-gray-800 hover:border-gray-700 shadow-lg"
-    }`}
+    className={`relative rounded-2xl border p-8 flex flex-col overflow-hidden transition-all duration-300 hover:scale-105 ${featured
+      ? "bg-indigo-500/10 border-indigo-500 scale-105 shadow-xl shadow-indigo-500/20 z-10"
+      : "bg-gray-900 border-gray-800 hover:border-gray-700 shadow-lg"
+      }`}
   >
     {featured && (
       <div className="absolute top-0 right-0">
@@ -70,11 +69,10 @@ const PricingCard = ({ name, price, description, features, featured }) => (
     </ul>
     <Link to="/signup" className="mt-auto">
       <button
-        className={`w-full py-3 rounded-xl font-semibold transition-all duration-200 ${
-          featured
-            ? "bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-500/25"
-            : "bg-gray-800 hover:bg-gray-700 text-white border border-gray-700"
-        }`}
+        className={`w-full py-3 rounded-xl font-semibold transition-all duration-200 ${featured
+          ? "bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-500/25"
+          : "bg-gray-800 hover:bg-gray-700 text-white border border-gray-700"
+          }`}
       >
         Get Started
       </button>
@@ -144,7 +142,9 @@ export default function LandingPage() {
       </section>
 
       {/* ── Features Section ─────────────────────────────────── */}
+      {/* <section id="features" className="py-24 border-t border-white/5"> */}
       <section id="features" className="py-24 border-t border-white/5">
+        {/* <div id="security" className="absolute -top-24" /> */}
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="text-3xl md:text-5xl font-bold text-white mb-6 tracking-tight">
@@ -225,6 +225,58 @@ export default function LandingPage() {
           </motion.div>
         </div>
       </section>
+
+      {/* ── Security Section ──────────────────────────────────── */}
+      <section id="security" className="py-24 border-t border-white/5 bg-indigo-500/5 relative overflow-hidden">
+        <div className="max-w-7xl mx-auto px-6 relative z-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+            >
+              <h2 className="text-3xl md:text-5xl font-bold text-white mb-6 tracking-tight">
+                Privacy-first Biometrics
+              </h2>
+              <p className="text-lg text-gray-400 mb-8 leading-relaxed">
+                We utilize decentralized identity protocols and zero-knowledge proofs.
+                Biometric templates are never stored as raw data—only as irreversible cryptographic hashes
+                anchored to an immutable blockchain ledger.
+              </p>
+              <div className="space-y-4">
+                {[
+                  "End-to-End Encryption (AES-256)",
+                  "Blockchain-verified Audit Trails",
+                  "Neural Liveness Detection",
+                  "GDPR & SOC2 Compliant"
+                ].map((feature, i) => (
+                  <div key={i} className="flex items-center gap-3 text-gray-300">
+                    <div className="h-6 w-6 rounded-full bg-indigo-500/20 flex items-center justify-center">
+                      <ShieldCheck className="h-4 w-4 text-indigo-400" />
+                    </div>
+                    <span className="font-medium">{feature}</span>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              className="relative group"
+            >
+              <div className="absolute inset-0 bg-indigo-500/20 blur-3xl rounded-full group-hover:bg-indigo-500/30 transition-all duration-500" />
+              <img
+                src="https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&q=80&w=1200"
+                alt="Security Protocols"
+                className="relative rounded-2xl border border-gray-800 shadow-2xl transition-transform duration-500 group-hover:rotate-1"
+              />
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
 
       {/* ── Pricing Section ──────────────────────────────────── */}
       <section id="pricing" className="py-24 bg-gray-900/50 border-t border-white/5 relative">
