@@ -21,7 +21,16 @@ async def blacklist_token(token: str, expires_in: int = None) -> None:
     await redis_client.setex(f"blacklist:{token}", expires_in, "revoked")
 
 async def is_token_blacklisted(token: str) -> bool:
-    return await redis_client.exists(f"blacklist:{token}") > 0
+    try:
+        return await redis_client.exists(f"blacklist:{token}") > 0
+    except Exception as exc:
+        # If Redis is unavailable, treat tokens as not blacklisted to avoid
+        # failing all authenticated requests. This makes the blacklist an
+        # optional best-effort feature in development environments.
+        import logging
+        logging.getLogger(__name__).warning(
+            f"Redis unavailable for token blacklist check: {exc}")
+        return False
 
 
 def create_access_token(subject: Union[str, Any], expires_delta: timedelta = None) -> str:

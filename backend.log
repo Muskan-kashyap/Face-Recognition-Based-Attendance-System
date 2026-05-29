@@ -1,0 +1,880 @@
+nohup: ignoring input
+INFO:     Will watch for changes in these directories: ['/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend']
+/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/face_recognition_models/__init__.py:7: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import resource_filename
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [117658] using StatReload
+/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/face_recognition_models/__init__.py:7: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import resource_filename
+INFO:     Started server process [117761]
+INFO:     Waiting for application startup.
+2026-05-29 11:30:49,342 | INFO | main | Creating tables...
+2026-05-29 11:30:49,582 | INFO | main | Tables created successfully.
+INFO:     Application startup complete.
+2026-05-29 11:30:56,479 | INFO | main | [dcd6d0eb] GET /health - Started
+2026-05-29 11:30:56,484 | INFO | main | [dcd6d0eb] GET /health - 200 - 5.57ms
+Warning: Could not enable extensions automatically (probably permissions). Ensure they are enabled manually. (psycopg2.errors.UndefinedTable) relation "face_embeddings" does not exist
+
+[SQL: 
+                CREATE INDEX IF NOT EXISTS idx_face_embeddings_hnsw 
+                ON face_embeddings 
+                USING hnsw (embedding vector_cosine_ops)
+                WITH (m = 16, ef_construction = 64);
+            ]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+INFO:     127.0.0.1:47758 - "GET /health HTTP/1.1" 200 OK
+2026-05-29 11:39:26,079 | INFO | main | [f50aa671] GET /health - Started
+2026-05-29 11:39:26,080 | INFO | main | [f50aa671] GET /health - 200 - 1.29ms
+INFO:     127.0.0.1:56558 - "GET /health HTTP/1.1" 200 OK
+2026-05-29 11:41:31,229 | INFO | main | [fe7ad707] POST /api/v1/auth/login - Started
+2026-05-29 11:41:31,235 | ERROR | app.core.rate_limit | Redis rate limiter error: Error 111 connecting to localhost:6379. Connect call failed ('127.0.0.1', 6379).
+2026-05-29 11:41:31,321 | INFO | main | [fe7ad707] POST /api/v1/auth/login - 401 - 92.23ms
+INFO:     127.0.0.1:38728 - "POST /api/v1/auth/login HTTP/1.1" 401 Unauthorized
+WARNING:  StatReload detected changes in 'app/db/seed.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+2026-05-29 11:42:40,447 | INFO | main | Shutting down application...
+INFO:     Application shutdown complete.
+INFO:     Finished server process [117761]
+/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/face_recognition_models/__init__.py:7: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import resource_filename
+INFO:     Started server process [128492]
+INFO:     Waiting for application startup.
+2026-05-29 11:42:44,490 | INFO | main | Creating tables...
+2026-05-29 11:42:44,533 | INFO | main | Tables created successfully.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'app/db/seed_comprehensive.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+2026-05-29 11:42:58,664 | INFO | main | Shutting down application...
+INFO:     Application shutdown complete.
+INFO:     Finished server process [128492]
+/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/face_recognition_models/__init__.py:7: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import resource_filename
+INFO:     Started server process [128758]
+INFO:     Waiting for application startup.
+2026-05-29 11:43:02,683 | INFO | main | Creating tables...
+2026-05-29 11:43:02,716 | INFO | main | Tables created successfully.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'app/db/seed.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+2026-05-29 11:43:32,785 | INFO | main | Shutting down application...
+INFO:     Application shutdown complete.
+INFO:     Finished server process [128758]
+/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/face_recognition_models/__init__.py:7: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import resource_filename
+INFO:     Started server process [129271]
+INFO:     Waiting for application startup.
+2026-05-29 11:43:37,063 | INFO | main | Creating tables...
+2026-05-29 11:43:37,135 | INFO | main | Tables created successfully.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'app/db/models/all_models.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+2026-05-29 11:46:36,041 | INFO | main | Shutting down application...
+INFO:     Application shutdown complete.
+INFO:     Finished server process [129271]
+/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/face_recognition_models/__init__.py:7: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import resource_filename
+INFO:     Started server process [131937]
+INFO:     Waiting for application startup.
+2026-05-29 11:46:40,064 | INFO | main | Creating tables...
+2026-05-29 11:46:40,097 | INFO | main | Tables created successfully.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'app/db/models/all_models.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+2026-05-29 11:46:46,918 | INFO | main | Shutting down application...
+INFO:     Application shutdown complete.
+INFO:     Finished server process [131937]
+/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/face_recognition_models/__init__.py:7: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import resource_filename
+INFO:     Started server process [132157]
+INFO:     Waiting for application startup.
+2026-05-29 11:46:50,854 | INFO | main | Creating tables...
+2026-05-29 11:46:50,890 | INFO | main | Tables created successfully.
+INFO:     Application startup complete.
+2026-05-29 11:47:01,365 | INFO | main | [95337d38] POST /api/v1/auth/login - Started
+2026-05-29 11:47:01,376 | ERROR | app.core.rate_limit | Redis rate limiter error: Error 111 connecting to localhost:6379. Connect call failed ('127.0.0.1', 6379).
+2026-05-29 11:47:01,715 | INFO | main | [95337d38] POST /api/v1/auth/login - 200 - 350.66ms
+PostgreSQL extensions and HNSW index enabled.
+INFO:     127.0.0.1:51932 - "POST /api/v1/auth/login HTTP/1.1" 200 OK
+2026-05-29 11:47:40,029 | INFO | main | [30871c72] GET /api/v1/users/me - Started
+2026-05-29 11:47:40,033 | ERROR | main | [30871c72] Unhandled exception: Error 111 connecting to localhost:6379. Connect call failed ('127.0.0.1', 6379).
+Traceback (most recent call last):
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/redis/asyncio/connection.py", line 381, in connect_check_health
+    await self._connect()
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/redis/asyncio/connection.py", line 946, in _connect
+    reader, writer = await asyncio.open_connection(
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/asyncio/streams.py", line 48, in open_connection
+    transport, _ = await loop.create_connection(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 1122, in create_connection
+    raise exceptions[0]
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 1104, in create_connection
+    sock = await self._connect_sock(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 1007, in _connect_sock
+    await self.sock_connect(sock, address)
+  File "/usr/lib/python3.12/asyncio/selector_events.py", line 651, in sock_connect
+    return await fut
+           ^^^^^^^^^
+  File "/usr/lib/python3.12/asyncio/selector_events.py", line 691, in _sock_connect_cb
+    raise OSError(err, f'Connect call failed {address}')
+ConnectionRefusedError: [Errno 111] Connect call failed ('127.0.0.1', 6379)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/main.py", line 78, in log_requests
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 168, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 144, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/middleware/cors.py", line 88, in __call__
+    await self.app(scope, receive, send)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 191, in __call__
+    with recv_stream, send_stream, collapse_excgroups():
+  File "/usr/lib/python3.12/contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/_utils.py", line 87, in collapse_excgroups
+    raise exc
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 193, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/main.py", line 45, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 168, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 144, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/routing.py", line 660, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/routing.py", line 680, in app
+    await route.handle(scope, receive, send)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/routing.py", line 276, in handle
+    await self.app(scope, receive, send)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 134, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 120, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 457, in app
+    solved_result = await solve_dependencies(
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/fastapi/dependencies/utils.py", line 649, in solve_dependencies
+    solved_result = await solve_dependencies(
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/fastapi/dependencies/utils.py", line 678, in solve_dependencies
+    solved = await call(**solved_result.values)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/app/api/deps.py", line 33, in get_current_user
+    if await security.is_token_blacklisted(token):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/app/core/security.py", line 24, in is_token_blacklisted
+    return await redis_client.exists(f"blacklist:{token}") > 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/redis/asyncio/client.py", line 822, in execute_command
+    conn = self.connection or await pool.get_connection()
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/redis/utils.py", line 249, in async_wrapper
+    return await func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/redis/asyncio/connection.py", line 1562, in get_connection
+    await self.ensure_connection(connection)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/redis/asyncio/connection.py", line 1603, in ensure_connection
+    await connection.connect()
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/redis/asyncio/connection.py", line 350, in connect
+    await self.retry.call_with_retry(
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/redis/asyncio/retry.py", line 81, in call_with_retry
+    raise error
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/redis/asyncio/retry.py", line 69, in call_with_retry
+    return await do()
+           ^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/redis/asyncio/connection.py", line 407, in connect_check_health
+    raise e
+redis.exceptions.ConnectionError: Error 111 connecting to localhost:6379. Connect call failed ('127.0.0.1', 6379).
+2026-05-29 11:47:40,048 | ERROR | main | Unhandled exception at /api/v1/users/me: Error 111 connecting to localhost:6379. Connect call failed ('127.0.0.1', 6379).
+Traceback (most recent call last):
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/redis/asyncio/connection.py", line 381, in connect_check_health
+    await self._connect()
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/redis/asyncio/connection.py", line 946, in _connect
+    reader, writer = await asyncio.open_connection(
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/asyncio/streams.py", line 48, in open_connection
+    transport, _ = await loop.create_connection(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 1122, in create_connection
+    raise exceptions[0]
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 1104, in create_connection
+    sock = await self._connect_sock(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 1007, in _connect_sock
+    await self.sock_connect(sock, address)
+  File "/usr/lib/python3.12/asyncio/selector_events.py", line 651, in sock_connect
+    return await fut
+           ^^^^^^^^^
+  File "/usr/lib/python3.12/asyncio/selector_events.py", line 691, in _sock_connect_cb
+    raise OSError(err, f'Connect call failed {address}')
+ConnectionRefusedError: [Errno 111] Connect call failed ('127.0.0.1', 6379)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 191, in __call__
+    with recv_stream, send_stream, collapse_excgroups():
+  File "/usr/lib/python3.12/contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/_utils.py", line 87, in collapse_excgroups
+    raise exc
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 193, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/main.py", line 78, in log_requests
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 168, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 144, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/middleware/cors.py", line 88, in __call__
+    await self.app(scope, receive, send)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 191, in __call__
+    with recv_stream, send_stream, collapse_excgroups():
+  File "/usr/lib/python3.12/contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/_utils.py", line 87, in collapse_excgroups
+    raise exc
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 193, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/main.py", line 45, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 168, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 144, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/routing.py", line 660, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/routing.py", line 680, in app
+    await route.handle(scope, receive, send)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/routing.py", line 276, in handle
+    await self.app(scope, receive, send)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 134, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 120, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 457, in app
+    solved_result = await solve_dependencies(
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/fastapi/dependencies/utils.py", line 649, in solve_dependencies
+    solved_result = await solve_dependencies(
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/fastapi/dependencies/utils.py", line 678, in solve_dependencies
+    solved = await call(**solved_result.values)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/app/api/deps.py", line 33, in get_current_user
+    if await security.is_token_blacklisted(token):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/app/core/security.py", line 24, in is_token_blacklisted
+    return await redis_client.exists(f"blacklist:{token}") > 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/redis/asyncio/client.py", line 822, in execute_command
+    conn = self.connection or await pool.get_connection()
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/redis/utils.py", line 249, in async_wrapper
+    return await func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/redis/asyncio/connection.py", line 1562, in get_connection
+    await self.ensure_connection(connection)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/redis/asyncio/connection.py", line 1603, in ensure_connection
+    await connection.connect()
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/redis/asyncio/connection.py", line 350, in connect
+    await self.retry.call_with_retry(
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/redis/asyncio/retry.py", line 81, in call_with_retry
+    raise error
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/redis/asyncio/retry.py", line 69, in call_with_retry
+    return await do()
+           ^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/redis/asyncio/connection.py", line 407, in connect_check_health
+    raise e
+redis.exceptions.ConnectionError: Error 111 connecting to localhost:6379. Connect call failed ('127.0.0.1', 6379).
+INFO:     127.0.0.1:39844 - "GET /api/v1/users/me HTTP/1.1" 500 Internal Server Error
+ERROR:    Exception in ASGI application
+Traceback (most recent call last):
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/redis/asyncio/connection.py", line 381, in connect_check_health
+    await self._connect()
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/redis/asyncio/connection.py", line 946, in _connect
+    reader, writer = await asyncio.open_connection(
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/asyncio/streams.py", line 48, in open_connection
+    transport, _ = await loop.create_connection(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 1122, in create_connection
+    raise exceptions[0]
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 1104, in create_connection
+    sock = await self._connect_sock(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 1007, in _connect_sock
+    await self.sock_connect(sock, address)
+  File "/usr/lib/python3.12/asyncio/selector_events.py", line 651, in sock_connect
+    return await fut
+           ^^^^^^^^^
+  File "/usr/lib/python3.12/asyncio/selector_events.py", line 691, in _sock_connect_cb
+    raise OSError(err, f'Connect call failed {address}')
+ConnectionRefusedError: [Errno 111] Connect call failed ('127.0.0.1', 6379)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/uvicorn/protocols/http/h11_impl.py", line 415, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/uvicorn/middleware/proxy_headers.py", line 63, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/fastapi/applications.py", line 1159, in __call__
+    await super().__call__(scope, receive, send)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/applications.py", line 90, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 186, in __call__
+    raise exc
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 191, in __call__
+    with recv_stream, send_stream, collapse_excgroups():
+  File "/usr/lib/python3.12/contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/_utils.py", line 87, in collapse_excgroups
+    raise exc
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 193, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/main.py", line 78, in log_requests
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 168, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 144, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/middleware/cors.py", line 88, in __call__
+    await self.app(scope, receive, send)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 191, in __call__
+    with recv_stream, send_stream, collapse_excgroups():
+  File "/usr/lib/python3.12/contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/_utils.py", line 87, in collapse_excgroups
+    raise exc
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 193, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/main.py", line 45, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 168, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 144, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/routing.py", line 660, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/routing.py", line 680, in app
+    await route.handle(scope, receive, send)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/routing.py", line 276, in handle
+    await self.app(scope, receive, send)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 134, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 120, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 457, in app
+    solved_result = await solve_dependencies(
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/fastapi/dependencies/utils.py", line 649, in solve_dependencies
+    solved_result = await solve_dependencies(
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/fastapi/dependencies/utils.py", line 678, in solve_dependencies
+    solved = await call(**solved_result.values)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/app/api/deps.py", line 33, in get_current_user
+    if await security.is_token_blacklisted(token):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/app/core/security.py", line 24, in is_token_blacklisted
+    return await redis_client.exists(f"blacklist:{token}") > 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/redis/asyncio/client.py", line 822, in execute_command
+    conn = self.connection or await pool.get_connection()
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/redis/utils.py", line 249, in async_wrapper
+    return await func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/redis/asyncio/connection.py", line 1562, in get_connection
+    await self.ensure_connection(connection)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/redis/asyncio/connection.py", line 1603, in ensure_connection
+    await connection.connect()
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/redis/asyncio/connection.py", line 350, in connect
+    await self.retry.call_with_retry(
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/redis/asyncio/retry.py", line 81, in call_with_retry
+    raise error
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/redis/asyncio/retry.py", line 69, in call_with_retry
+    return await do()
+           ^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/redis/asyncio/connection.py", line 407, in connect_check_health
+    raise e
+redis.exceptions.ConnectionError: Error 111 connecting to localhost:6379. Connect call failed ('127.0.0.1', 6379).
+WARNING:  StatReload detected changes in 'app/api/deps.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+2026-05-29 11:49:28,161 | INFO | main | Shutting down application...
+INFO:     Application shutdown complete.
+INFO:     Finished server process [132157]
+/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/face_recognition_models/__init__.py:7: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import resource_filename
+INFO:     Started server process [134848]
+INFO:     Waiting for application startup.
+2026-05-29 11:49:33,319 | INFO | main | Creating tables...
+2026-05-29 11:49:33,363 | INFO | main | Tables created successfully.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'app/api/deps.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+2026-05-29 11:49:34,982 | INFO | main | Shutting down application...
+INFO:     Application shutdown complete.
+INFO:     Finished server process [134848]
+/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/face_recognition_models/__init__.py:7: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import resource_filename
+INFO:     Started server process [134950]
+INFO:     Waiting for application startup.
+2026-05-29 11:49:40,089 | INFO | main | Creating tables...
+2026-05-29 11:49:40,133 | INFO | main | Tables created successfully.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'app/api/deps.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+2026-05-29 11:49:47,353 | INFO | main | Shutting down application...
+INFO:     Application shutdown complete.
+INFO:     Finished server process [134950]
+/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/face_recognition_models/__init__.py:7: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import resource_filename
+INFO:     Started server process [135126]
+INFO:     Waiting for application startup.
+2026-05-29 11:49:51,244 | INFO | main | Creating tables...
+2026-05-29 11:49:51,274 | INFO | main | Tables created successfully.
+INFO:     Application startup complete.
+2026-05-29 11:50:19,250 | INFO | main | [a75c1088] GET /api/v1/users/me - Started
+2026-05-29 11:50:19,255 | ERROR | main | [a75c1088] Unhandled exception: Error 111 connecting to localhost:6379. Connect call failed ('127.0.0.1', 6379).
+Traceback (most recent call last):
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/redis/asyncio/connection.py", line 381, in connect_check_health
+    await self._connect()
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/redis/asyncio/connection.py", line 946, in _connect
+    reader, writer = await asyncio.open_connection(
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/asyncio/streams.py", line 48, in open_connection
+    transport, _ = await loop.create_connection(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 1122, in create_connection
+    raise exceptions[0]
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 1104, in create_connection
+    sock = await self._connect_sock(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 1007, in _connect_sock
+    await self.sock_connect(sock, address)
+  File "/usr/lib/python3.12/asyncio/selector_events.py", line 651, in sock_connect
+    return await fut
+           ^^^^^^^^^
+  File "/usr/lib/python3.12/asyncio/selector_events.py", line 691, in _sock_connect_cb
+    raise OSError(err, f'Connect call failed {address}')
+ConnectionRefusedError: [Errno 111] Connect call failed ('127.0.0.1', 6379)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/main.py", line 78, in log_requests
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 168, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 144, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/middleware/cors.py", line 88, in __call__
+    await self.app(scope, receive, send)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 191, in __call__
+    with recv_stream, send_stream, collapse_excgroups():
+  File "/usr/lib/python3.12/contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/_utils.py", line 87, in collapse_excgroups
+    raise exc
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 193, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/main.py", line 45, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 168, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 144, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/routing.py", line 660, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/routing.py", line 680, in app
+    await route.handle(scope, receive, send)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/routing.py", line 276, in handle
+    await self.app(scope, receive, send)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 134, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 120, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 457, in app
+    solved_result = await solve_dependencies(
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/fastapi/dependencies/utils.py", line 649, in solve_dependencies
+    solved_result = await solve_dependencies(
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/fastapi/dependencies/utils.py", line 678, in solve_dependencies
+    solved = await call(**solved_result.values)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/app/api/deps.py", line 33, in get_current_user
+    if await security.is_token_blacklisted(token):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/app/core/security.py", line 24, in is_token_blacklisted
+    return await redis_client.exists(f"blacklist:{token}") > 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/redis/asyncio/client.py", line 822, in execute_command
+    conn = self.connection or await pool.get_connection()
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/redis/utils.py", line 249, in async_wrapper
+    return await func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/redis/asyncio/connection.py", line 1562, in get_connection
+    await self.ensure_connection(connection)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/redis/asyncio/connection.py", line 1603, in ensure_connection
+    await connection.connect()
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/redis/asyncio/connection.py", line 350, in connect
+    await self.retry.call_with_retry(
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/redis/asyncio/retry.py", line 81, in call_with_retry
+    raise error
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/redis/asyncio/retry.py", line 69, in call_with_retry
+    return await do()
+           ^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/redis/asyncio/connection.py", line 407, in connect_check_health
+    raise e
+redis.exceptions.ConnectionError: Error 111 connecting to localhost:6379. Connect call failed ('127.0.0.1', 6379).
+2026-05-29 11:50:19,262 | ERROR | main | Unhandled exception at /api/v1/users/me: Error 111 connecting to localhost:6379. Connect call failed ('127.0.0.1', 6379).
+Traceback (most recent call last):
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/redis/asyncio/connection.py", line 381, in connect_check_health
+    await self._connect()
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/redis/asyncio/connection.py", line 946, in _connect
+    reader, writer = await asyncio.open_connection(
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/asyncio/streams.py", line 48, in open_connection
+    transport, _ = await loop.create_connection(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 1122, in create_connection
+    raise exceptions[0]
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 1104, in create_connection
+    sock = await self._connect_sock(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 1007, in _connect_sock
+    await self.sock_connect(sock, address)
+  File "/usr/lib/python3.12/asyncio/selector_events.py", line 651, in sock_connect
+    return await fut
+           ^^^^^^^^^
+  File "/usr/lib/python3.12/asyncio/selector_events.py", line 691, in _sock_connect_cb
+    raise OSError(err, f'Connect call failed {address}')
+ConnectionRefusedError: [Errno 111] Connect call failed ('127.0.0.1', 6379)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 191, in __call__
+    with recv_stream, send_stream, collapse_excgroups():
+  File "/usr/lib/python3.12/contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/_utils.py", line 87, in collapse_excgroups
+    raise exc
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 193, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/main.py", line 78, in log_requests
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 168, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 144, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/middleware/cors.py", line 88, in __call__
+    await self.app(scope, receive, send)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 191, in __call__
+    with recv_stream, send_stream, collapse_excgroups():
+  File "/usr/lib/python3.12/contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/_utils.py", line 87, in collapse_excgroups
+    raise exc
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 193, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/main.py", line 45, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 168, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 144, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/routing.py", line 660, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/routing.py", line 680, in app
+    await route.handle(scope, receive, send)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/routing.py", line 276, in handle
+    await self.app(scope, receive, send)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 134, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 120, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 457, in app
+    solved_result = await solve_dependencies(
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/fastapi/dependencies/utils.py", line 649, in solve_dependencies
+    solved_result = await solve_dependencies(
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/fastapi/dependencies/utils.py", line 678, in solve_dependencies
+    solved = await call(**solved_result.values)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/app/api/deps.py", line 33, in get_current_user
+    if await security.is_token_blacklisted(token):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/app/core/security.py", line 24, in is_token_blacklisted
+    return await redis_client.exists(f"blacklist:{token}") > 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/redis/asyncio/client.py", line 822, in execute_command
+    conn = self.connection or await pool.get_connection()
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/redis/utils.py", line 249, in async_wrapper
+    return await func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/redis/asyncio/connection.py", line 1562, in get_connection
+    await self.ensure_connection(connection)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/redis/asyncio/connection.py", line 1603, in ensure_connection
+    await connection.connect()
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/redis/asyncio/connection.py", line 350, in connect
+    await self.retry.call_with_retry(
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/redis/asyncio/retry.py", line 81, in call_with_retry
+    raise error
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/redis/asyncio/retry.py", line 69, in call_with_retry
+    return await do()
+           ^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/redis/asyncio/connection.py", line 407, in connect_check_health
+    raise e
+redis.exceptions.ConnectionError: Error 111 connecting to localhost:6379. Connect call failed ('127.0.0.1', 6379).
+PostgreSQL extensions and HNSW index enabled.
+INFO:     127.0.0.1:47832 - "GET /api/v1/users/me HTTP/1.1" 500 Internal Server Error
+ERROR:    Exception in ASGI application
+Traceback (most recent call last):
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/redis/asyncio/connection.py", line 381, in connect_check_health
+    await self._connect()
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/redis/asyncio/connection.py", line 946, in _connect
+    reader, writer = await asyncio.open_connection(
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/asyncio/streams.py", line 48, in open_connection
+    transport, _ = await loop.create_connection(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 1122, in create_connection
+    raise exceptions[0]
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 1104, in create_connection
+    sock = await self._connect_sock(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 1007, in _connect_sock
+    await self.sock_connect(sock, address)
+  File "/usr/lib/python3.12/asyncio/selector_events.py", line 651, in sock_connect
+    return await fut
+           ^^^^^^^^^
+  File "/usr/lib/python3.12/asyncio/selector_events.py", line 691, in _sock_connect_cb
+    raise OSError(err, f'Connect call failed {address}')
+ConnectionRefusedError: [Errno 111] Connect call failed ('127.0.0.1', 6379)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/uvicorn/protocols/http/h11_impl.py", line 415, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/uvicorn/middleware/proxy_headers.py", line 63, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/fastapi/applications.py", line 1159, in __call__
+    await super().__call__(scope, receive, send)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/applications.py", line 90, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 186, in __call__
+    raise exc
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 191, in __call__
+    with recv_stream, send_stream, collapse_excgroups():
+  File "/usr/lib/python3.12/contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/_utils.py", line 87, in collapse_excgroups
+    raise exc
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 193, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/main.py", line 78, in log_requests
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 168, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 144, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/middleware/cors.py", line 88, in __call__
+    await self.app(scope, receive, send)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 191, in __call__
+    with recv_stream, send_stream, collapse_excgroups():
+  File "/usr/lib/python3.12/contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/_utils.py", line 87, in collapse_excgroups
+    raise exc
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 193, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/main.py", line 45, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 168, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/middleware/base.py", line 144, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/routing.py", line 660, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/routing.py", line 680, in app
+    await route.handle(scope, receive, send)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/routing.py", line 276, in handle
+    await self.app(scope, receive, send)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 134, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 120, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 457, in app
+    solved_result = await solve_dependencies(
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/fastapi/dependencies/utils.py", line 649, in solve_dependencies
+    solved_result = await solve_dependencies(
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/fastapi/dependencies/utils.py", line 678, in solve_dependencies
+    solved = await call(**solved_result.values)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/app/api/deps.py", line 33, in get_current_user
+    if await security.is_token_blacklisted(token):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/app/core/security.py", line 24, in is_token_blacklisted
+    return await redis_client.exists(f"blacklist:{token}") > 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/redis/asyncio/client.py", line 822, in execute_command
+    conn = self.connection or await pool.get_connection()
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/redis/utils.py", line 249, in async_wrapper
+    return await func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/redis/asyncio/connection.py", line 1562, in get_connection
+    await self.ensure_connection(connection)
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/redis/asyncio/connection.py", line 1603, in ensure_connection
+    await connection.connect()
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/redis/asyncio/connection.py", line 350, in connect
+    await self.retry.call_with_retry(
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/redis/asyncio/retry.py", line 81, in call_with_retry
+    raise error
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/redis/asyncio/retry.py", line 69, in call_with_retry
+    return await do()
+           ^^^^^^^^^^
+  File "/home/dheeraj/NIELIT/Project/Face-Recognition-Based-Attendance-System/backend/.venv/lib/python3.12/site-packages/redis/asyncio/connection.py", line 407, in connect_check_health
+    raise e
+redis.exceptions.ConnectionError: Error 111 connecting to localhost:6379. Connect call failed ('127.0.0.1', 6379).
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+2026-05-29 11:51:19,482 | INFO | main | Shutting down application...
+INFO:     Application shutdown complete.
+INFO:     Finished server process [135126]
+INFO:     Stopping reloader process [117658]

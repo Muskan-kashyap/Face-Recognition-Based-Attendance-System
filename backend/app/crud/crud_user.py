@@ -61,8 +61,8 @@ class CRUDUser:
             org_id=org_id,
             role_id=role.id,
             employee_id=f"EMP-{uuid.uuid4().hex[:6].upper()}",
-            is_active=1,
-            is_deleted=0,
+            is_active=True,
+            is_deleted=False,
         )
         db.add(db_obj)
         db.commit()
@@ -77,15 +77,15 @@ class CRUDUser:
         # Deactivate previous
         db.query(FaceEmbedding).filter(
             FaceEmbedding.user_id == user_id,
-            FaceEmbedding.is_active == 1
-        ).update({"is_active": 0})
+            FaceEmbedding.is_active == True
+        ).update({"is_active": False})
         db.commit()
 
         face_obj = FaceEmbedding(
             user_id=user_id,
             embedding=embedding,
             model_name="face_recognition",
-            is_active=1
+            is_active=True
         )
         db.add(face_obj)
         db.commit()

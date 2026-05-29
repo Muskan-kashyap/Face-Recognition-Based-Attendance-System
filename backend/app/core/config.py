@@ -2,6 +2,8 @@
 #  core/config.py
 # =============================================================================
 from __future__ import annotations
+import json
+import os
 import secrets
 import logging
 from functools import lru_cache
@@ -11,6 +13,10 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 from urllib.parse import quote_plus
 
 logger = logging.getLogger(__name__)
+
+# Remove blank complex env vars so .env defaults can be used instead.
+if os.environ.get("ALLOWED_ORIGINS", None) == "":
+    os.environ.pop("ALLOWED_ORIGINS", None)
 
 
 class Settings(BaseSettings):
@@ -70,6 +76,23 @@ class Settings(BaseSettings):
                 f"@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}")
     # CORS
     ALLOWED_ORIGINS: List[str] = ["http://localhost:3000", "http://localhost:5173"]
+
+    @field_validator("ALLOWED_ORIGINS", mode="before")
+    @classmethod
+    def parse_allowed_origins(cls, v: str | List[str]) -> List[str]:
+        if isinstance(v, str):
+            raw = v.strip()
+            if raw == "":
+                return []
+            if raw.startswith("[") and raw.endswith("]"):
+                try:
+                    parsed = json.loads(raw)
+                    if isinstance(parsed, list):
+                        return [str(origin).strip() for origin in parsed if str(origin).strip()]
+                except json.JSONDecodeError:
+                    pass
+            return [origin.strip() for origin in raw.split(",") if origin.strip()]
+        return v
 
     # Face recognition
     FACE_MODEL_NAME: str = "Facenet"

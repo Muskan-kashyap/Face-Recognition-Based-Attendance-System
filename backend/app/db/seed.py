@@ -62,8 +62,8 @@ def seed_db():
             email="admin@example.com",
             employee_id="ADM-001",
             hashed_password=get_password_hash(seed_password),
-            is_active=1,
-            is_deleted=0,
+            is_active=True,
+            is_deleted=False,
         )
         db.add(admin)
         db.commit()

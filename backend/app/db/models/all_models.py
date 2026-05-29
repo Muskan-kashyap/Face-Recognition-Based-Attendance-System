@@ -46,10 +46,9 @@ class Organization(Base):
     blockchain_root_key: Mapped[Optional[str]] = mapped_column(NVARCHAR(255), nullable=True)
     zkp_threshold: Mapped[float] = mapped_column(Numeric(4, 2), nullable=False,
                                                   server_default=text("0.98"))
-    # NOTE: Using Integer(0/1) for booleans to avoid schema migration.
-    # Future: migrate to Boolean with Alembic.
-    is_active: Mapped[int] = mapped_column(Integer, nullable=False, default=1,
-                                            server_default=text("1"))
+    is_active: Mapped[bool] = mapped_column(Boolean, nullable=False,
+                                            default=True,
+                                            server_default=text("TRUE"))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False,
                                                   default=_utc_now, server_default=text("NOW()"))
     api_keys:    Mapped[List["OrgApiKey"]]  = relationship("OrgApiKey",  back_populates="organization",

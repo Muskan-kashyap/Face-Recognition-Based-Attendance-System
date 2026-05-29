@@ -7,7 +7,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
 from pydantic import ValidationError
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 
 from app.core.config import settings
 from app.core import security
@@ -42,7 +42,7 @@ async def get_current_user(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Could not validate credentials",
         )
-    user = db.query(User).filter(User.id == token_data.sub, User.is_deleted == 0).first()
+    user = db.query(User).options(selectinload(User.role)).filter(User.id == token_data.sub, User.is_deleted == 0).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return user

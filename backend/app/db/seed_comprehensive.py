@@ -163,8 +163,8 @@ def seed_comprehensive():
                     email=email,
                     employee_id=employee_id,
                     hashed_password=get_password_hash(password),
-                    is_active=1,
-                    is_deleted=0
+                    is_active=True,
+                    is_deleted=False
                 )
                 db.add(user)
                 created_users.append({
@@ -190,8 +190,8 @@ def seed_comprehensive():
                 email="inactive.test@visioncore.com",
                 employee_id="EMP-INACT",
                 hashed_password=get_password_hash("Inactive1!2024"),
-                is_active=0,  # DEACTIVATED
-                is_deleted=0
+                is_active=False,  # DEACTIVATED
+                is_deleted=False
             )
             db.add(deactivated_user)
             created_users.append({
@@ -216,8 +216,8 @@ def seed_comprehensive():
                 email="john.doe.incomplete@visioncore.com",
                 employee_id="EMP-INCMP",
                 hashed_password=get_password_hash("Incomplete1!2024"),
-                is_active=1,
-                is_deleted=0
+                is_active=True,
+                is_deleted=False
             )
             db.add(incomplete_user)
             created_users.append({

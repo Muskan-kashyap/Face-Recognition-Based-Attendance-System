@@ -72,9 +72,9 @@ class Base(DeclarativeBase):
 def NVARCHAR(length: int) -> String:
     """
     Drop-in replacement for VARCHAR that enforces Unicode storage.
-    Renders as VARCHAR(n) on PostgreSQL with Unicode collation support.
+    Renders as VARCHAR(n) on PostgreSQL.
     """
-    return String(length, collation="pg_catalog.default")
+    return String(length)
 
 
 # =============================================================================
