@@ -283,12 +283,3 @@ curl -H "Authorization: Bearer <ACCESS_TOKEN>" http://127.0.0.1:8000/api/v1/user
 
 ---
 
-## Support / Next steps
-
-If you want, I can:
-- Add a `docker-compose.yml` for an opinionated local dev setup (Postgres + Redis + backend + frontend).
-- Add `.env.example` at `backend/.env.example` and update `README.md` with short setup steps.
-
----
-
-_Last updated: 2026-05-29_

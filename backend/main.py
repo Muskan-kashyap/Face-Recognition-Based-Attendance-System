@@ -6,12 +6,15 @@ from contextlib import asynccontextmanager
 import uvicorn
 from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, PlainTextResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.routers import api_router
 from app.util.init import create_tables
 from app.core.config import settings
+from app.core.metrics_middleware import MetricsMiddleware
+from app.core.observability import metrics
+
 
 # Configure structured logging
 logging.basicConfig(
@@ -53,9 +56,11 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
 
 
 app.add_middleware(SecurityHeadersMiddleware)
+app.add_middleware(MetricsMiddleware)
 
 
 # ── CORS ─────────────────────────────────────────────────────────────────────
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.ALLOWED_ORIGINS,
@@ -99,15 +104,31 @@ async def global_exception_handler(request: Request, exc: Exception):
     )
 
 
+# ── CORS preflight reliability ─────────────────────────────────────────────
+# Some deployments/proxies may still block bare OPTIONS unless explicitly handled.
+@app.options("/{rest_of_path:path}")
+async def options_handler(rest_of_path: str):
+    return JSONResponse(status_code=200, content={})
+
+
 # ── Health Check ─────────────────────────────────────────────────────────────
 @app.get("/health", tags=["health"])
 def health_check():
     return {"status": "healthy", "version": settings.APP_VERSION, "environment": settings.ENVIRONMENT}
 
 
+@app.get("/metrics", tags=["metrics"])
+def metrics_endpoint() -> PlainTextResponse:
+    return PlainTextResponse(
+        content=metrics.render_prometheus_text(),
+        media_type="text/plain; version=0.0.4; charset=utf-8",
+    )
+
+
 @app.get("/")
 def read_root():
     return {"message": f"Welcome to {settings.APP_NAME} v{settings.APP_VERSION}"}
+
 
 
 # ── API Routers ──────────────────────────────────────────────────────────────

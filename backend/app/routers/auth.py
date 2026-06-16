@@ -3,10 +3,13 @@ auth.py — Public authentication endpoints.
 """
 from datetime import timedelta
 from typing import Any
+
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordRequestForm
 from jose import jwt
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
+
 
 from app.api import deps
 from app.core import security
@@ -60,14 +63,24 @@ def login_access_token(
     }
 
 
+class RefreshRequest(BaseModel):
+    refresh_token: str
+
+
+
 @router.post("/refresh", response_model=Token)
 async def refresh_access_token(
-    refresh_token: str,
+    req: RefreshRequest,
     db: Session = Depends(deps.get_db),
 ) -> Any:
     """
     Refresh an access token using a valid refresh token.
+
+    Note: `req` is explicit so the endpoint reliably accepts JSON body:
+    {"refresh_token": "..."}
     """
+    refresh_token = req.refresh_token
+
     if await security.is_token_blacklisted(refresh_token):
         raise HTTPException(status_code=401, detail="Refresh token has been revoked")
 
@@ -76,7 +89,11 @@ async def refresh_access_token(
 
     try:
         payload = jwt.decode(refresh_token, settings.SECRET_KEY, algorithms=[security.ALGORITHM])
-        user_id = int(payload.get("sub"))
+        sub = payload.get("sub")
+        if sub is None:
+            raise ValueError("Missing sub")
+        user_id = int(sub)
+
     except Exception:
         raise HTTPException(status_code=401, detail="Invalid refresh token")
 
@@ -86,10 +103,13 @@ async def refresh_access_token(
 
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     return {
-        "access_token": security.create_access_token(user_obj.id, expires_delta=access_token_expires),
+        "access_token": security.create_access_token(
+            user_obj.id, expires_delta=access_token_expires
+        ),
         "refresh_token": refresh_token,
         "token_type": "bearer",
     }
+
 
 
 @router.post("/logout")
@@ -126,6 +146,13 @@ def register_user(
             status_code=400,
             detail="Email already registered."
         )
-    new_user = crud_user.create(db, obj_in=user_in.model_dump())
+
+    # SECURITY FIX (P0): Public registration must not allow privilege escalation.
+    # Force the lowest-privilege role.
+    payload = user_in.model_dump()
+    payload["role"] = "Employee"
+
+    new_user = crud_user.create(db, obj_in=payload)
     return new_user
+
 

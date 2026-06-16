@@ -3,15 +3,16 @@ users.py — RBAC-protected user management router.
 All queries are scoped to current_user.org_id for strict multi-tenancy.
 """
 from typing import Any, List
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 
 from app.crud.crud_user import user as crud_user
 from app.api import deps
-from app.schema.user import UserResponse, UserCreate, UserUpdate, FaceEnroll
+from app.schema.user import UserResponse, UserCreate, UserUpdate
 from app.db.models.all_models import User
 from app.db.database import get_db
+from app.services.face_engine import face_engine
 
 router = APIRouter()
 
@@ -24,7 +25,7 @@ def read_users(
     current_user: User = Depends(deps.get_current_active_user),
 ) -> Any:
     """STRICT MULTI-TENANCY: Admins only see users in their own org."""
-    if current_user.role.name not in ["Admin", "Manager"]:
+    if current_user.role.name not in ["Admin", "Manager", "SuperAdmin"]:
         raise HTTPException(status_code=403, detail="Unauthorized")
     return db.query(User).filter(
         User.org_id == current_user.org_id,
@@ -39,8 +40,9 @@ def create_user(
     user_in: UserCreate,
     current_user: User = Depends(deps.get_current_active_user),
 ) -> Any:
-    if current_user.role.name not in ["Admin", "Manager"]:
+    if current_user.role.name not in ["Admin", "Manager", "SuperAdmin"]:
         raise HTTPException(status_code=403, detail="Unauthorized")
+
 
     # Enforce org_id from the calling admin's session — prevents org spoofing
     user_in.org_id = current_user.org_id
@@ -78,17 +80,18 @@ def read_user_by_id(
     ).first()
     if not user:
         raise HTTPException(status_code=404, detail="Identity not found")
-    if current_user.id != user_id and current_user.role.name not in ["Admin", "Manager"]:
+    if current_user.id != user_id and current_user.role.name not in ["Admin", "Manager", "SuperAdmin"]:
         raise HTTPException(status_code=403, detail="Forbidden")
+
     return user
 
 
-@router.post("/{user_id}/enroll")
-def enroll_user_face(
+@router.post("/{user_id}/enroll-face")
+async def enroll_user_face(
     *,
     db: Session = Depends(get_db),
     user_id: int,
-    enroll_in: FaceEnroll,
+    file: UploadFile = File(...),
     current_user: User = Depends(deps.get_current_active_user),
 ) -> Any:
     # SECURE: multi-tenant + role check
@@ -98,8 +101,14 @@ def enroll_user_face(
     ).first()
     if not user:
         raise HTTPException(status_code=404, detail="Identity not found")
-    if current_user.role.name not in ["Admin", "Manager"] and current_user.id != user_id:
+    if current_user.role.name not in ["Admin", "Manager", "SuperAdmin"] and current_user.id != user_id:
         raise HTTPException(status_code=403, detail="Forbidden")
 
-    crud_user.enroll_face(db, user_id=user_id, embedding=enroll_in.face_embedding)
+    image_bytes = await file.read()
+    embedding = face_engine.get_embedding(image_bytes)
+    
+    if not embedding:
+        raise HTTPException(status_code=400, detail="No face or multiple faces detected in the image.")
+
+    crud_user.enroll_face(db, user_id=user_id, embedding=embedding)
     return {"status": "success", "message": "Neural identity registered."}

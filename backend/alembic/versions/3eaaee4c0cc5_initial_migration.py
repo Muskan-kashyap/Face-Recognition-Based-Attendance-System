@@ -58,6 +58,44 @@ def upgrade() -> None:
     )
     op.create_index(op.f('ix_roles_id'), 'roles', ['id'], unique=False)
     op.create_index(op.f('ix_roles_name'), 'roles', ['name'], unique=True)
+    op.create_table('permissions',
+    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('name', sa.String(length=120), nullable=False),
+    sa.Column('description', sa.Text(), nullable=True),
+    sa.Column('category', sa.String(length=80), nullable=True),
+    sa.Column('is_active', sa.Boolean(), server_default=sa.text('TRUE'), nullable=False),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('NOW()'), nullable=False),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('name')
+    )
+    op.create_index(op.f('ix_permissions_id'), 'permissions', ['id'], unique=False)
+    op.create_index(op.f('ix_permissions_name'), 'permissions', ['name'], unique=False)
+    op.create_table('role_permissions',
+    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('role_id', sa.Integer(), nullable=False),
+    sa.Column('permission_id', sa.Integer(), nullable=False),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('NOW()'), nullable=False),
+    sa.ForeignKeyConstraint(['permission_id'], ['permissions.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['role_id'], ['roles.id'], ondelete='CASCADE'),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('role_id', 'permission_id', name='uq_role_permission')
+    )
+    op.create_index(op.f('ix_role_permissions_id'), 'role_permissions', ['id'], unique=False)
+    op.create_index(op.f('ix_role_permissions_role_id'), 'role_permissions', ['role_id'], unique=False)
+    op.create_index(op.f('ix_role_permissions_permission_id'), 'role_permissions', ['permission_id'], unique=False)
+    op.create_table('user_roles',
+    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('user_id', sa.Integer(), nullable=False),
+    sa.Column('role_id', sa.Integer(), nullable=False),
+    sa.Column('assigned_at', sa.DateTime(timezone=True), server_default=sa.text('NOW()'), nullable=False),
+    sa.ForeignKeyConstraint(['role_id'], ['roles.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ondelete='CASCADE'),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('user_id', 'role_id', name='uq_user_role')
+    )
+    op.create_index(op.f('ix_user_roles_id'), 'user_roles', ['id'], unique=False)
+    op.create_index(op.f('ix_user_roles_user_id'), 'user_roles', ['user_id'], unique=False)
+    op.create_index(op.f('ix_user_roles_role_id'), 'user_roles', ['role_id'], unique=False)
     op.create_table('departments',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('org_id', sa.UUID(), nullable=False),
@@ -159,6 +197,28 @@ def upgrade() -> None:
     op.create_index(op.f('ix_users_role_id'), 'users', ['role_id'], unique=False)
     op.create_index(op.f('ix_users_shift_id'), 'users', ['shift_id'], unique=False)
     op.create_index(op.f('ix_users_username'), 'users', ['username'], unique=True)
+    op.create_table('reports',
+    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('org_id', sa.UUID(), nullable=False),
+    sa.Column('requested_by', sa.Integer(), nullable=True),
+    sa.Column('report_type', sa.String(length=80), nullable=False),
+    sa.Column('parameters', postgresql.JSONB(astext_type=sa.Text()), server_default=sa.text("'{}'::jsonb"), nullable=False),
+    sa.Column('status', sa.String(length=30), server_default=sa.text("'pending'"), nullable=False),
+    sa.Column('output_format', sa.String(length=10), server_default=sa.text("'pdf'"), nullable=False),
+    sa.Column('storage_url', sa.String(length=512), nullable=True),
+    sa.Column('file_path', sa.Text(), nullable=True),
+    sa.Column('requested_at', sa.DateTime(timezone=True), server_default=sa.text('NOW()'), nullable=False),
+    sa.Column('completed_at', sa.DateTime(timezone=True), nullable=True),
+    sa.Column('expires_at', sa.DateTime(timezone=True), nullable=True),
+    sa.CheckConstraint("status IN ('pending','running','completed','failed')", name='ck_reports_status'),
+    sa.ForeignKeyConstraint(['org_id'], ['organizations.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['requested_by'], ['users.id'], ondelete='SET NULL'),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_index(op.f('ix_reports_id'), 'reports', ['id'], unique=False)
+    op.create_index(op.f('ix_reports_org_id'), 'reports', ['org_id'], unique=False)
+    op.create_index(op.f('ix_reports_requested_by'), 'reports', ['requested_by'], unique=False)
+    op.create_index('ix_reports_org_status', 'reports', ['org_id', 'status'], unique=False)
     op.create_table('attendance_logs',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=False),
@@ -202,6 +262,23 @@ def upgrade() -> None:
     op.create_index('ix_face_embeddings_active_user', 'face_embeddings', ['user_id'], unique=False, postgresql_where=sa.text('is_active = 1'))
     op.create_index(op.f('ix_face_embeddings_id'), 'face_embeddings', ['id'], unique=False)
     op.create_index(op.f('ix_face_embeddings_user_id'), 'face_embeddings', ['user_id'], unique=False)
+    op.create_table('emotion_logs',
+    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('user_id', sa.Integer(), nullable=False),
+    sa.Column('attendance_log_id', sa.Integer(), nullable=True),
+    sa.Column('emotion', sa.String(length=30), nullable=False),
+    sa.Column('confidence', sa.Numeric(precision=4, scale=3), nullable=False),
+    sa.Column('model_name', sa.String(length=50), server_default=sa.text("'InsightFace'"), nullable=False),
+    sa.Column('face_metadata', postgresql.JSONB(astext_type=sa.Text()), nullable=True),
+    sa.Column('detected_at', sa.DateTime(timezone=True), server_default=sa.text('NOW()'), nullable=False),
+    sa.ForeignKeyConstraint(['attendance_log_id'], ['attendance_logs.id'], ondelete='SET NULL'),
+    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ondelete='CASCADE'),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_index(op.f('ix_emotion_logs_id'), 'emotion_logs', ['id'], unique=False)
+    op.create_index(op.f('ix_emotion_logs_user_id'), 'emotion_logs', ['user_id'], unique=False)
+    op.create_index(op.f('ix_emotion_logs_attendance_log_id'), 'emotion_logs', ['attendance_log_id'], unique=False)
+    op.create_index('ix_emotion_user_time', 'emotion_logs', ['user_id', 'detected_at'], unique=False)
     op.create_table('monthly_growth_summary',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=False),
@@ -258,6 +335,26 @@ def downgrade() -> None:
     op.drop_index(op.f('ix_manual_overrides_attendance_log_id'), table_name='manual_overrides')
     op.drop_index(op.f('ix_manual_overrides_admin_user_id'), table_name='manual_overrides')
     op.drop_table('manual_overrides')
+    op.drop_index(op.f('ix_reports_requested_by'), table_name='reports')
+    op.drop_index(op.f('ix_reports_org_id'), table_name='reports')
+    op.drop_index(op.f('ix_reports_id'), table_name='reports')
+    op.drop_index('ix_reports_org_status', table_name='reports')
+    op.drop_table('reports')
+    op.drop_index(op.f('ix_emotion_logs_attendance_log_id'), table_name='emotion_logs')
+    op.drop_index(op.f('ix_emotion_logs_user_id'), table_name='emotion_logs')
+    op.drop_index(op.f('ix_emotion_logs_id'), table_name='emotion_logs')
+    op.drop_table('emotion_logs')
+    op.drop_index(op.f('ix_user_roles_role_id'), table_name='user_roles')
+    op.drop_index(op.f('ix_user_roles_user_id'), table_name='user_roles')
+    op.drop_index(op.f('ix_user_roles_id'), table_name='user_roles')
+    op.drop_table('user_roles')
+    op.drop_index(op.f('ix_role_permissions_permission_id'), table_name='role_permissions')
+    op.drop_index(op.f('ix_role_permissions_role_id'), table_name='role_permissions')
+    op.drop_index(op.f('ix_role_permissions_id'), table_name='role_permissions')
+    op.drop_table('role_permissions')
+    op.drop_index(op.f('ix_permissions_name'), table_name='permissions')
+    op.drop_index(op.f('ix_permissions_id'), table_name='permissions')
+    op.drop_table('permissions')
     op.drop_index(op.f('ix_monthly_growth_summary_user_id'), table_name='monthly_growth_summary')
     op.drop_index(op.f('ix_monthly_growth_summary_id'), table_name='monthly_growth_summary')
     op.drop_index('ix_monthly_burnout_risk', table_name='monthly_growth_summary', postgresql_where=sa.text('burnout_risk_score > 40'))

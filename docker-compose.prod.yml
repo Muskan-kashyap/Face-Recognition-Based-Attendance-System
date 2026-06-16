@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    image: ${ECR_REGISTRY}/attendance-backend:latest
+    container_name: attendance_backend_prod
+    restart: always
+    ports:
+      - "80:8000"
+    environment:
+      - ENVIRONMENT=production
+      - API_V1_STR=/api/v1
+      - DATABASE_URL=${DATABASE_URL}
+      - REDIS_URL=${REDIS_URL}
+      - SECRET_KEY=${SECRET_KEY}
+      - BLOCKCHAIN_ENABLED=${BLOCKCHAIN_ENABLED}
+      - BLOCKCHAIN_PRIVATE_KEY=${BLOCKCHAIN_PRIVATE_KEY}
+      - BLOCKCHAIN_CONTRACT_ADDRESS=${BLOCKCHAIN_CONTRACT_ADDRESS}
+      - BLOCKCHAIN_URL=${BLOCKCHAIN_URL}
+      # AI model configurations
+      - DEEPFACE_HOME=/app/models
+      - TORCH_HOME=/app/models
+    volumes:
+      - ./models:/app/models
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s

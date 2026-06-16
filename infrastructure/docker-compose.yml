@@ -1,0 +1,210 @@
+services:
+  # Databases & Infrastructure services
+  postgres:
+    image: ankane/pgvector:v0.5.1
+    container_name: face_postgres
+    environment:
+      POSTGRES_USER: dbadmin
+      POSTGRES_PASSWORD: SecretPassword123
+      POSTGRES_DB: face_attendance_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/001-init.sql:ro
+    networks:
+      - net-internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dbadmin -d face_attendance_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  db_init:
+    image: postgres:16-alpine
+    container_name: face_db_init
+    volumes:
+      - ./database/init.sql:/init.sql:ro
+    environment:
+      PGPASSWORD: SecretPassword123
+    command: >
+      sh -c "psql -h postgres -U dbadmin -d face_attendance_db -v ON_ERROR_STOP=1 -f /init.sql"
+    networks:
+      - net-internal
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  redis:
+    image: redis:7.2-alpine
+    container_name: face_redis
+    ports:
+      - "6379:6379"
+    networks:
+      - net-internal
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  rabbitmq:
+    image: rabbitmq:3.12-management-alpine
+    container_name: face_rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - net-internal
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 10s
+      retries: 3
+
+  # Core Services
+  gateway:
+    build:
+      context: ../gateway
+      dockerfile: Dockerfile
+    container_name: face_gateway
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=development
+      - AUTH_SVC_URL=http://auth_svc:8001
+      - BIO_SVC_URL=http://bio_svc:8002
+      - ATT_SVC_URL=http://att_svc:8003
+      - ANAL_SVC_URL=http://anal_svc:8005
+      - BLOCKCHAIN_SVC_URL=http://blockchain_svc:8004
+      - CORS_ORIGINS=http://localhost:3000,http://127.0.0.1:3000,http://localhost:5173,http://127.0.0.1:5173
+    networks:
+      - net-internal
+    depends_on:
+      db_init:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+
+  auth_svc:
+    build:
+      context: ../auth-service
+      dockerfile: Dockerfile
+    container_name: face_auth_svc
+    ports:
+      - "8001:8001"
+    environment:
+      - DATABASE_URL=postgresql://dbadmin:SecretPassword123@postgres:5432/face_attendance_db
+      - REDIS_URL=redis://redis:6379/0
+      - JWT_SECRET=SuperSecretKeyAtLeast32CharsLongMustBeComplex!
+    networks:
+      - net-internal
+    depends_on:
+      db_init:
+        condition: service_completed_successfully
+
+  bio_svc:
+    build:
+      context: ../ai-service
+      dockerfile: Dockerfile
+    container_name: face_bio_svc
+    ports:
+      - "8002:8002"
+    environment:
+      - DATABASE_URL=postgresql://dbadmin:SecretPassword123@postgres:5432/face_attendance_db
+      - JWT_SECRET=SuperSecretKeyAtLeast32CharsLongMustBeComplex!
+    networks:
+      - net-internal
+    depends_on:
+      db_init:
+        condition: service_completed_successfully
+
+  att_svc:
+    build:
+      context: ../attendance-service
+      dockerfile: Dockerfile
+    container_name: face_att_svc
+    ports:
+      - "8003:8003"
+    environment:
+      - DATABASE_URL=postgresql://dbadmin:SecretPassword123@postgres:5432/face_attendance_db
+      - REDIS_URL=redis://redis:6379/0
+      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
+      - JWT_SECRET=SuperSecretKeyAtLeast32CharsLongMustBeComplex!
+    networks:
+      - net-internal
+    depends_on:
+      db_init:
+        condition: service_completed_successfully
+      rabbitmq:
+        condition: service_healthy
+
+  blockchain_svc:
+    build:
+      context: ../blockchain-service
+      dockerfile: Dockerfile
+    container_name: face_blockchain_svc
+    ports:
+      - "8004:8004"
+    environment:
+      - DATABASE_URL=postgresql://dbadmin:SecretPassword123@postgres:5432/face_attendance_db
+      - BLOCKCHAIN_URL=http://ganache:8545
+    networks:
+      - net-internal
+    depends_on:
+      db_init:
+        condition: service_completed_successfully
+      ganache:
+        condition: service_started
+
+  anal_svc:
+    build:
+      context: ../analytics-service
+      dockerfile: Dockerfile
+    container_name: face_anal_svc
+    ports:
+      - "8005:8005"
+    environment:
+      - DATABASE_URL=postgresql://dbadmin:SecretPassword123@postgres:5432/face_attendance_db
+    networks:
+      - net-internal
+    depends_on:
+      db_init:
+        condition: service_completed_successfully
+
+  ganache:
+    image: trufflesuite/ganache:v7.9.2
+    container_name: face_ganache
+    command:
+      - --host
+      - 0.0.0.0
+      - --chain.chainId
+      - "1337"
+      - --wallet.deterministic
+    ports:
+      - "8545:8545"
+    networks:
+      - net-internal
+
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    container_name: face_frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_API_URL=http://localhost:8000/api/v1
+    networks:
+      - net-internal
+    depends_on:
+      gateway:
+        condition: service_started
+
+networks:
+  net-internal:
+    driver: bridge
+
+volumes:
+  pgdata:
+    driver: local

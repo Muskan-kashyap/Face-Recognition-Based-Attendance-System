@@ -20,11 +20,11 @@ class AttendanceLogResponse(BaseModel):
     id: int
     user_id: int
     check_in: datetime
-    check_out: Optional[datetime]
+    check_out: Optional[datetime] = None
     status: str
-    emotion: Optional[str]
+    emotion: Optional[str] = None
     is_live: int
-    recognition_distance: Optional[float]
+    recognition_distance: Optional[float] = None
     source: str
     created_at: datetime
     

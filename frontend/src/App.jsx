@@ -54,12 +54,12 @@ const AppRoutes = () => {
         </ProtectedRoute>
       } />
       <Route path="/dashboard/users" element={
-        <ProtectedRoute requiredRole="Admin">
+        <ProtectedRoute requiredRoles={['SuperAdmin', 'Admin']}>
           <DashboardLayout><UserManagement /></DashboardLayout>
         </ProtectedRoute>
       } />
       <Route path="/dashboard/reports" element={
-        <ProtectedRoute requiredRole="Admin">
+        <ProtectedRoute requiredRoles={['SuperAdmin', 'Admin', 'Manager']}>
           <DashboardLayout><Reports /></DashboardLayout>
         </ProtectedRoute>
       } />
@@ -74,7 +74,7 @@ const AppRoutes = () => {
         </ProtectedRoute>
       } />
       <Route path="/dashboard/payroll" element={
-        <ProtectedRoute requiredRole="Admin">
+        <ProtectedRoute requiredRoles={['SuperAdmin', 'Admin']}>
           <DashboardLayout><Payroll /></DashboardLayout>
         </ProtectedRoute>
       } />

@@ -1,38 +1,30 @@
 import logging
-import cv2
-import numpy as np
+import base64
+import requests
 from typing import Tuple
 
 logger = logging.getLogger(__name__)
+
+AI_SERVICE_URL = "http://ai-service:8002/api/v1/biometrics"
 
 class LivenessService:
     @staticmethod
     def detect_liveness(image_bytes: bytes) -> Tuple[bool, float]:
         """
-        Detects if the face in the image is a real person or a spoof (photo/video).
-        Returns (is_live, confidence_score).
-
-        This is a professional-grade mock/placeholder that explains how
-        we'd use a Fourier Transform or a dedicated Liveness model.
+        Proxy method to ai-service for liveness detection.
         """
         try:
-            nparr = np.frombuffer(image_bytes, np.uint8)
-            img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-
-            if img is None:
-                return False, 0.0
-
-            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-            variance = cv2.Laplacian(gray, cv2.CV_64F).var()
-
-            is_live = variance > 100
-            confidence = min(variance / 500, 1.0)
-
-            return bool(is_live), float(confidence)
-
+            b64_img = base64.b64encode(image_bytes).decode('utf-8')
+            resp = requests.post(f"{AI_SERVICE_URL}/liveness", json={"image_base64": b64_img}, timeout=5)
+            if resp.status_code == 200:
+                data = resp.json()
+                return data.get("is_live", False), data.get("confidence", 0.0)
+            return False, 0.0
         except Exception as e:
-            logger.error("Liveness detection error: %s", e)
+            logger.error("Error communicating with AI service for liveness: %s", e)
             return False, 0.0
 
 liveness_service = LivenessService()
+
+
 

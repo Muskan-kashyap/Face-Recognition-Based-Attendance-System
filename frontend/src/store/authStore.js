@@ -31,6 +31,11 @@ export const useAuthStore = create(
           return true;
         } catch (error) {
           set({ isLoading: false });
+          // Surface real backend error (often /users/me fails after successful /auth/login)
+          const detail = error?.response?.data?.detail;
+          if (detail) {
+            error.response.data.detail = detail;
+          }
           throw error;
         }
       },
@@ -43,6 +48,7 @@ export const useAuthStore = create(
           }
         } catch (e) {
           // Ignore logout errors
+          void e;
         } finally {
           set({
             user: null,

@@ -3,14 +3,35 @@ import hashlib
 import json
 import logging
 from typing import Any, Optional
-from diskcache import Cache
+try:
+    from diskcache import Cache
+except ModuleNotFoundError:  # dev/env fallback
+    Cache = None
+
 from app.core.config import settings
 
 logger = logging.getLogger(__name__)
 
 # In a real 2026 prod env, this would be Redis.
 # DiskCache is a high-performance alternative for edge/local deployments.
-cache = Cache(settings.CACHE_DIR if hasattr(settings, 'CACHE_DIR') else "/tmp/visioncore_cache")
+if Cache is not None:
+    cache = Cache(settings.CACHE_DIR if hasattr(settings, "CACHE_DIR") else "/tmp/visioncore_cache")
+else:
+    # Non-blocking no-op cache when diskcache isn't installed.
+    class _NoOpCache:
+        def get(self, _key):
+            return None
+
+        def set(self, _key, _value, expire=None):
+            return None
+
+        def iterkeys(self):
+            return iter(())
+
+        def delete(self, _key):
+            return None
+
+    cache = _NoOpCache()
 
 
 def _make_cache_key(func_name: str, args: tuple, kwargs: dict) -> str:

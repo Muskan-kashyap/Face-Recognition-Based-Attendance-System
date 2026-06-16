@@ -1,20 +1,22 @@
-from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks, Query
+from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks, Query, Request
+
 from sqlalchemy.orm import Session
 from datetime import datetime
 from typing import Any, List
 import base64
 import logging
 
-from app.crud.crud_attendance import attendance as crud_attendance
 from app.schema.attendance import CheckInRequest, AttendanceLogResponse
 from app.db.database import get_db
 from app.api import deps
 from app.db.models.all_models import User, AttendanceLog
 from app.services.analytics import analytics_service
-from app.services.blockchain import background_blockchain_anchor
 from app.services.cache import cache_response
-from app.services.face_engine import face_engine
-from app.services.liveness import liveness_service
+from app.services.attendance_controller import attendance_controller
+from app.services.blockchain import background_blockchain_anchor
+from app.core.rate_limit import rate_limit_dependency
+
+
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -25,7 +27,7 @@ logger = logging.getLogger(__name__)
 async def get_wellness_heatmap(
     *,
     db: Session = Depends(get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    current_user: User = Depends(deps.require_permission("attendance.view")),
 ) -> Any:
     """
     STRICT MULTI-TENANCY: Uses org_id from authenticated user.
@@ -73,78 +75,42 @@ def get_logs(
 @router.post("/check-in", response_model=AttendanceLogResponse)
 async def check_in(
     *,
+    request: Request,
     db: Session = Depends(get_db),
     req: CheckInRequest,
     background_tasks: BackgroundTasks,
     current_user: User = Depends(deps.get_current_active_user),
+    _: bool = Depends(rate_limit_dependency(max_requests=10, window_seconds=60)),
 ) -> Any:
+
     """
     Refactored check-in with robust error handling and async anchoring.
     SECURE: Requires authenticated user. Users can only check in as themselves
     unless Admin/Manager.
     """
-    image_bytes = None
-    if req.image_base64:
-        try:
-            image_bytes = base64.b64decode(req.image_base64)
-        except Exception:
-            raise HTTPException(status_code=400, detail="Malformed base64 image data")
+    try:
+        log = attendance_controller.handle_check_in(
+            db,
+            req=req,
+            current_user=current_user,
+            background_tasks=background_tasks,
+        )
+        return log
+    except PermissionError as e:
+        raise HTTPException(status_code=403, detail=str(e))
+    except LookupError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except HTTPException:
+        raise
+    except Exception as e:
+        # Preserve observability context (request_id is set by main.py middleware)
+        request_id = getattr(getattr(request, "state", None), "request_id", None)
+        logger.exception(f"Check-in failed [request_id={request_id}]: {e}")
 
-    # 1. Liveness & Face Identification
-    if image_bytes:
-        try:
-            is_live, _ = liveness_service.detect_liveness(image_bytes)
-            req.is_live = 1 if is_live else 0
+        raise HTTPException(status_code=500, detail="Biometric processing failed")
 
-            if not req.user_id:
-                embedding = face_engine.get_embedding(image_bytes)
-                if not embedding:
-                    raise HTTPException(status_code=400, detail="No face detected")
-
-                user_id = crud_attendance.find_user_by_face(db, embedding=embedding)
-                if not user_id:
-                    raise HTTPException(status_code=404, detail="Identity not found")
-                req.user_id = user_id
-                req.emotion = face_engine.get_emotion(image_bytes)
-        except HTTPException:
-            raise
-        except Exception as e:
-            logger.error(f"AI Processing Error: {e}")
-            raise HTTPException(status_code=500, detail="Biometric processing failed")
-
-    if not req.user_id:
-        raise HTTPException(status_code=400, detail="User identification required")
-
-    # SECURE: Prevent check-in spoofing — users can only clock in as themselves
-    if current_user.role.name not in ["Admin", "Manager"] and req.user_id != current_user.id:
-        raise HTTPException(status_code=403, detail="You can only check in for yourself")
-
-    # 2. Logic Branch: Shift Status
-    status_str = "on_time"
-    from sqlalchemy.orm import joinedload
-    user = db.query(User).options(joinedload(User.shift)).filter(User.id == req.user_id).first()
-    if user and user.shift:
-        dt_start = datetime.combine(datetime.today(), user.shift.start_time)
-        dt_check = datetime.combine(datetime.today(), req.timestamp.time())
-        diff = (dt_check - dt_start).total_seconds() / 60
-        if diff > user.shift.grace_period_mins:
-            status_str = "late"
-        elif diff < -user.shift.buffer_mins:
-            status_str = "early"
-
-    # 3. Save Record
-    log = crud_attendance.log_check_in(db, obj_in=req, status=status_str)
-
-    # 4. Offload Blockchain to Background
-    payload = {
-        "log_id": log.id,
-        "user_id": log.user_id,
-        "status": log.status,
-        "timestamp": log.check_in.isoformat()
-    }
-    background_tasks.add_task(background_blockchain_anchor, log.id, payload, "attendance")
-
-    return log
 
 
 @router.patch("/logs/{log_id}", response_model=AttendanceLogResponse)
@@ -153,11 +119,9 @@ def update_attendance_log(
     db: Session = Depends(get_db),
     log_id: int,
     status: str,
-    current_user: User = Depends(deps.get_current_active_user),
+    current_user: User = Depends(deps.require_permission("attendance.override")),
     background_tasks: BackgroundTasks
 ) -> Any:
-    if current_user.role.name not in ["Admin", "Manager"]:
-        raise HTTPException(status_code=403, detail="Unauthorized")
 
     # SECURE: Ensure the log belongs to the admin's organization
     log = db.query(AttendanceLog).join(User).filter(
@@ -176,3 +140,4 @@ def update_attendance_log(
     background_tasks.add_task(background_blockchain_anchor, log.id, payload, "manual_override")
 
     return log
+

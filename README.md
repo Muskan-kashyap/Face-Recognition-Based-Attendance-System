@@ -1,104 +1,48 @@
-# Face Recognition Based Attendance System
+# Face Recognition-Based Attendance System
+> **An Enterprise-Grade, Zero-Knowledge Biometric Time and Attendance Platform with Web3 Anchoring.**
 
-This repository contains a full-stack attendance system using face recognition, with a FastAPI backend and a Vite + React frontend.
+[![Python 3.12](https://img.shields.io/badge/Python-3.12-blue.svg)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-00a393.svg)](https://fastapi.tiangolo.com/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-pgvector-336791.svg)](https://www.postgresql.org/)
+[![Ethereum Web3](https://img.shields.io/badge/Web3-Sepolia_Testnet-627EEA.svg)](https://ethereum.org/)
 
-## What is included
-- `backend/`: FastAPI server, PostgreSQL/Redis configuration, face recognition and blockchain integration
-- `frontend/`: React application built with Vite
-- `Dockerfile.prod`: production build container setup for backend and frontend
+## Executive Summary
+The Face Recognition-Based Attendance System is a modern, high-performance platform designed to eliminate buddy-punching, streamline payroll operations, and guarantee absolute auditability. By combining state-of-the-art DeepFace models, high-speed `pgvector` similarity searches, and immutable Ethereum blockchain anchoring, this system provides organizations with mathematically undeniable attendance records.
 
-## Prerequisites
-- Python 3.10+ / 3.12 recommended
-- Node 18+ / npm 10+
-- Git installed locally
-- PostgreSQL database
-- Redis server
-- Optional: Docker for containerized deployment
+## Key Features
+* **Zero-Knowledge Biometrics**: Raw face images are never stored. The system strictly stores 128-dimensional mathematical embeddings.
+* **Liveness Detection**: Anti-spoofing pipeline rejects static photographs and digital masks.
+* **Web3 Audit Trail**: Every check-in is hashed and anchored to an Ethereum smart contract.
+* **Role-Based Access Control (RBAC)**: Multi-tenant architecture with distinct permissions for SuperAdmins, Admins, Managers, and Employees.
+* **Emotion & Burnout Analytics**: Background analysis of employee sentiment to detect burnout risks and trigger managerial nudges.
+* **Resilient Infrastructure**: Failsafe Redis implementation gracefully degrades token blacklisting without taking the system offline.
 
-## Full local setup script
-From the repository root, run:
+## Technology Stack
+* **Backend**: FastAPI (Python 3.12)
+* **AI/ML Engine**: DeepFace, PyTorch
+* **Database**: PostgreSQL 15+ with `pgvector` extension
+* **Caching/Rate-Limiting**: Redis (ElastiCache)
+* **Blockchain**: Solidity (`AttendanceAudit.sol`), `web3.py`
+* **Deployment**: Docker Compose, AWS EC2, GitHub Actions
 
+## Architecture Snapshot
+The platform employs a hybrid proxy architecture. A lightweight **FastAPI Monolith** handles all HTTP routing, JWT validation, rate limiting, and database interactions. Heavy biometric operations are offloaded via HTTP to an isolated **AI-Service** container, allowing the ML models to fully utilize attached GPUs (like the NVIDIA T4) without blocking concurrent API requests.
+
+## Quick Start
+1. Configure your `.env` variables (see `SETUP.md`).
+2. Run the deployment sequence:
 ```bash
-chmod +x setup.sh
-./setup.sh
+docker-compose -f docker-compose.prod.yml up -d
+docker-compose -f docker-compose.prod.yml run --rm backend alembic upgrade head
 ```
 
-This will create the backend virtual environment, install backend and frontend dependencies, and prepare the project for local development.
+## Documentation Index
+Comprehensive documentation can be found in the `docs/` directory:
+1. [Project Overview](docs/project-overview.md)
+2. [Architecture Blueprint](docs/architecture.md)
+3. [Database Design](docs/database-design.md)
+4. [Deployment Guide](docs/deployment-guide.md)
+5. [Security Design](docs/security-design.md)
 
-## Backend setup
-1. Create a Python virtual environment:
-
-```bash
-cd backend
-python3 -m venv .venv
-source .venv/bin/activate
-```
-
-2. Upgrade pip and install backend dependencies:
-
-```bash
-python -m pip install --upgrade pip
-pip install -r requirements.txt
-```
-
-3. Copy the example environment file and update values:
-
-```bash
-cp .env.example .env
-```
-
-4. Edit `backend/.env` and set the PostgreSQL credentials, `SECRET_KEY`, and any other required values.
-
-5. Start the backend server:
-
-```bash
-uvicorn main:app --reload --host 127.0.0.1 --port 8000
-```
-
-The backend API will be available at `http://127.0.0.1:8000` and Swagger docs at `http://127.0.0.1:8000/docs`.
-
-## Frontend setup
-1. Install frontend dependencies:
-
-```bash
-cd frontend
-npm install
-```
-
-2. Confirm the frontend API URL in `frontend/.env`:
-
-```text
-VITE_API_URL=http://localhost:8000/api/v1
-VITE_ENVIRONMENT=development
-```
-
-3. Start the frontend development server:
-
-```bash
-npm run dev
-```
-
-The frontend will typically be available at `http://localhost:5173`.
-
-## Running both locally
-1. Start the backend first.
-2. Start the frontend second.
-3. Open the frontend URL in your browser.
-
-## Docker production build
-Build the image with:
-
-```bash
-docker build -f Dockerfile.prod -t facerec-attendance .
-```
-
-Run the container:
-
-```bash
-docker run -p 80:80 facerec-attendance
-```
-
-## Notes
-- Backend environment variables are loaded from `backend/.env`.
-- The frontend reads `frontend/.env` to determine the API URL.
-- If you use PostgreSQL on a different host or port, update `POSTGRES_HOST` and `POSTGRES_PORT` in `backend/.env`.
+## License
+Proprietary / Closed Source. All rights reserved.

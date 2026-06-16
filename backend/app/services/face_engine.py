@@ -1,79 +1,41 @@
 import logging
-import numpy as np
+import base64
+import requests
 from typing import List, Optional
 
 logger = logging.getLogger(__name__)
 
-try:
-    import face_recognition
-    FACE_RECOGNITION_AVAILABLE = True
-except ImportError:
-    FACE_RECOGNITION_AVAILABLE = False
+# URL of the AI microservice
+AI_SERVICE_URL = "http://ai-service:8002/api/v1/biometrics"
 
 class FaceEngine:
+    """
+    HTTP Client proxy for the Biometrics Microservice (ai-service).
+    Offloads heavy ML operations (DeepFace, PyTorch) to the dedicated service.
+    """
+
     @staticmethod
     def get_embedding(image_bytes: bytes) -> Optional[List[float]]:
-        """
-        Given a raw image bytes array, return a 128-d face embedding.
-        If no face or multiple faces are detected, return None.
-        """
-        if not FACE_RECOGNITION_AVAILABLE:
-            raise RuntimeError("face_recognition module not available. Biometric service offline.")
-
-        import io
-        from PIL import Image
-
         try:
-            image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
-            image_array = np.array(image)
+            b64_img = base64.b64encode(image_bytes).decode('utf-8')
+            resp = requests.post(f"{AI_SERVICE_URL}/extract", json={"image_base64": b64_img}, timeout=5)
+            if resp.status_code == 200:
+                return resp.json().get("embedding")
+            return None
         except Exception as e:
-            logger.error("Error loading image: %s", e)
+            logger.error("Error communicating with AI service for embedding: %s", e)
             return None
-
-        face_locations = face_recognition.face_locations(image_array)
-        if len(face_locations) != 1:
-            return None
-
-        face_encodings = face_recognition.face_encodings(image_array, face_locations)
-        if len(face_encodings) == 0:
-            return None
-
-        return face_encodings[0].tolist()
-
-    @staticmethod
-    def compare_embeddings(embedding1: List[float], embedding2: List[float], tolerance: float = 0.5) -> bool:
-        """
-        Compare two 128-d face embeddings and return True if they match.
-        """
-        enc1 = np.array(embedding1)
-        enc2 = np.array(embedding2)
-        distance = np.linalg.norm(enc1 - enc2)
-        return distance <= tolerance
 
     @staticmethod
     def get_emotion(image_bytes: bytes) -> str:
-        """
-        Analyze the face in the image for emotional expression.
-        """
         try:
-            from deepface import DeepFace
-            import io
-            from PIL import Image
-
-            image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
-            image_array = np.array(image)
-
-            objs = DeepFace.analyze(
-                img_path=image_array,
-                actions=['emotion'],
-                enforce_detection=False
-            )
-
-            if objs:
-                return objs[0]['dominant_emotion']
+            b64_img = base64.b64encode(image_bytes).decode('utf-8')
+            resp = requests.post(f"{AI_SERVICE_URL}/emotion", json={"image_base64": b64_img}, timeout=5)
+            if resp.status_code == 200:
+                return resp.json().get("emotion", "neutral")
             return "neutral"
         except Exception as e:
-            logger.error("Emotion analysis failed: %s", e)
+            logger.error("Error communicating with AI service for emotion: %s", e)
             return "neutral"
 
 face_engine = FaceEngine()

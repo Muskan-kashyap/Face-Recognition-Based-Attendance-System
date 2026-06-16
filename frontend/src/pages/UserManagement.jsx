@@ -4,6 +4,7 @@ import { Search, UserPlus, Camera, X, Mail, Shield, Building, MoreVertical } fro
 import Webcam from 'react-webcam';
 import { userService } from '../services/userService';
 import { useAuthStore } from '../store/authStore';
+import { useToast } from '../components/ui/Toast';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
@@ -23,7 +24,10 @@ export default function UserManagement() {
   const [enrollUser, setEnrollUser] = useState(null);
   const webcamRef = useRef(null);
   const { user: currentUser } = useAuthStore();
-  const isAdmin = ['Admin', 'Manager'].includes(currentUser?.role?.name);
+  const toast = useToast();
+  const currentRole = currentUser?.role?.name;
+  const canManageUsers = ['Admin', 'SuperAdmin'].includes(currentRole);
+  const canAssignAdmin = currentRole === 'SuperAdmin';
 
   const [form, setForm] = useState({
     full_name: '',
@@ -53,9 +57,10 @@ export default function UserManagement() {
       await userService.createUser(form);
       setShowAdd(false);
       setForm({ full_name: '', email: '', password: '', role: 'Employee', organization: '' });
+      toast({ message: `Account provisioned for ${form.full_name}.`, type: 'success' });
       fetchUsers();
     } catch (err) {
-      alert(err.response?.data?.detail || 'Failed to create user');
+      toast({ message: err.response?.data?.detail || 'Failed to create user.', type: 'error' });
     }
   };
 
@@ -65,9 +70,10 @@ export default function UserManagement() {
       const mockEmbedding = Array.from({ length: 128 }, () => Math.random());
       await userService.enrollFace(enrollUser.id, mockEmbedding);
       setEnrollUser(null);
+      toast({ message: `Biometric template saved for ${enrollUser.full_name}.`, type: 'success' });
       fetchUsers();
     } catch (err) {
-      alert(err.response?.data?.detail || 'Enrollment failed');
+      toast({ message: err.response?.data?.detail || 'Enrollment failed.', type: 'error' });
     }
   };
 
@@ -87,7 +93,7 @@ export default function UserManagement() {
           <h1 className="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">Organization Users</h1>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Manage employee accounts and biometric enrollments.</p>
         </div>
-        {isAdmin && (
+        {canManageUsers && (
           <Button onClick={() => setShowAdd(true)} className="shadow-lg shadow-primary-500/30 hover:scale-105 transition-transform">
             <UserPlus className="mr-2 h-5 w-5" />
             Add Employee
@@ -176,7 +182,7 @@ export default function UserManagement() {
                           </div>
                         </td>
                         <td className="px-6 py-4 text-right">
-                          {isAdmin && (
+                          {canManageUsers && (
                             <Button
                               variant="ghost"
                               size="sm"
@@ -239,7 +245,7 @@ export default function UserManagement() {
                   options={[
                     { value: 'Employee', label: 'Employee' },
                     { value: 'Manager', label: 'Manager' },
-                    { value: 'Admin', label: 'Admin' },
+                    ...(canAssignAdmin ? [{ value: 'Admin', label: 'Admin' }] : []),
                   ]}
                   className="bg-slate-50 dark:bg-slate-900/50"
                 />

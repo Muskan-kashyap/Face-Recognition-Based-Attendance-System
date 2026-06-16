@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: platform-config
+  namespace: face-attendance
+data:
+  ENVIRONMENT: "production"
+  REDIS_URL: "redis://redis-service:6379/0"
+  RABBITMQ_URL: "amqp://guest:guest@rabbitmq-service:5672/"
+  AUTH_SVC_URL: "http://auth-service:8001"
+  BIO_SVC_URL: "http://biometrics-service:8002"
+  ATT_SVC_URL: "http://attendance-service:8003"
+  ANAL_SVC_URL: "http://analytics-service:8005"
+  BLOCKCHAIN_URL: "https://rpc-amoy.polygon.technology"

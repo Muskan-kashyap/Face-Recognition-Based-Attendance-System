@@ -14,7 +14,10 @@ engine = create_engine(
     SQLALCHEMY_DATABASE_URL,
     pool_pre_ping=True,   # Detect stale connections
     pool_size=10,         # Connection pool for concurrent requests
-    max_overflow=20
+    max_overflow=20,
+    # Avoid long hangs during import-time engine initialization when DB is down.
+    # psycopg2 respects connect_timeout.
+    connect_args={"connect_timeout": 3},
 )
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 

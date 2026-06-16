@@ -1,10 +1,15 @@
 import apiClient from './apiClient';
 
 export const authService = {
-  login: (email, password) =>
-    apiClient.post('/auth/login', new URLSearchParams({ username: email, password }), {
+  login: (email, password) => {
+    const formData = new URLSearchParams();
+    formData.append('username', email);
+    formData.append('password', password);
+
+    return apiClient.post('/auth/login', formData, {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    }),
+    });
+  },
 
   register: (data) => apiClient.post('/auth/register', data),
 
@@ -14,13 +19,10 @@ export const authService = {
     }),
 
   refreshToken: (refreshToken) =>
-    apiClient.post('/auth/refresh', null, {
-      params: { refresh_token: refreshToken },
-    }),
+    apiClient.post('/auth/refresh', { refresh_token: refreshToken }),
 
   getMe: (token) =>
     apiClient.get('/users/me', {
       headers: { Authorization: `Bearer ${token}` },
     }),
 };
-
