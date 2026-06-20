@@ -64,17 +64,96 @@ export default function UserManagement() {
     }
   };
 
-  const handleEnroll = async () => {
-    if (!webcamRef.current || !enrollUser) return;
-    try {
-      const mockEmbedding = Array.from({ length: 128 }, () => Math.random());
-      await userService.enrollFace(enrollUser.id, mockEmbedding);
-      setEnrollUser(null);
-      toast({ message: `Biometric template saved for ${enrollUser.full_name}.`, type: 'success' });
-      fetchUsers();
-    } catch (err) {
-      toast({ message: err.response?.data?.detail || 'Enrollment failed.', type: 'error' });
+  // const handleEnroll = async () => {
+  //   if (!webcamRef.current || !enrollUser) return;
+  //   try {
+  //     // const mockEmbedding = Array.from({ length: 128 }, () => Math.random());
+  //     // await userService.enrollFace(enrollUser.id, mockEmbedding);
+  //     // setEnrollUser(null);
+  //     // toast({ message: `Biometric template saved for ${enrollUser.full_name}.`, type: 'success' });
+  //     // fetchUsers();
+  //     const dataURLtoFile = async (dataUrl, filename) => {
+  //       const response = await fetch(dataUrl);
+  //       const blob = await response.blob();
+
+  //       return new File(
+  //         [blob],
+  //         filename,
+  //         {
+  //           type: "image/jpeg",
+  //         }
+  //       );
+  //     };
+  //   } catch (err) {
+  //     toast({ message: err.response?.data?.detail || 'Enrollment failed.', type: 'error' });
+  //   }
+  // };
+
+
+const handleEnroll = async () => {
+  if (!webcamRef.current || !enrollUser) {
+    return;
+  }
+
+  try {
+    const imageSrc =
+      webcamRef.current.getScreenshot();
+
+    if (!imageSrc) {
+      throw new Error(
+        "Failed to capture image"
+      );
     }
+
+    const imageFile =
+      dataURLtoFile(
+        imageSrc,
+        "face.jpg"
+      );
+
+    await userService.enrollFace(
+      enrollUser.id,
+      imageFile
+    );
+
+    toast({
+      message: `Biometric template saved for ${enrollUser.full_name}.`,
+      type: "success",
+    });
+
+    setEnrollUser(null);
+
+    fetchUsers();
+  } catch (err) {
+    console.error(err);
+
+    toast({
+      message:
+        err.response?.data?.detail ||
+        "Enrollment failed.",
+      type: "error",
+    });
+  }
+};
+  const dataURLtoFile = (dataurl, filename) => {
+    const arr = dataurl.split(",");
+    const mime = arr[0].match(/:(.*?);/)[1];
+
+    const bstr = atob(arr[1]);
+
+    let n = bstr.length;
+
+    const u8arr = new Uint8Array(n);
+
+    while (n--) {
+      u8arr[n] = bstr.charCodeAt(n);
+    }
+
+    return new File(
+      [u8arr],
+      filename,
+      { type: mime }
+    );
   };
 
   const filtered = users.filter((u) =>

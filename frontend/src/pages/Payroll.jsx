@@ -73,7 +73,7 @@ export default function Payroll() {
             <select
               value={month}
               onChange={(e) => setMonth(Number(e.target.value))}
-              className="bg-transparent text-sm text-white outline-none"
+              className="bg-gray-800 text-sm text-white outline-none"
             >
               {months.map((m) => (
                 <option key={m.value} value={m.value}>{m.label}</option>

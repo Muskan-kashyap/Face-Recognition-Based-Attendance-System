@@ -51,15 +51,26 @@ function clearAuthStorage(): void {
 }
 
 // Intercept requests to add JWT token
+// apiClient.interceptors.request.use((config) => {
+//   const token = getAuthToken();
+//   if (token) {
+//     config.headers.Authorization = `Bearer ${token}`;
+//   }
+//   // Add request ID for tracing
+//   config.headers['X-Request-ID'] = Math.random().toString(36).substring(2, 10);
+//   return config;
+// }, (error) => Promise.reject(error));
+
 apiClient.interceptors.request.use((config) => {
-  const token = getAuthToken();
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  // Add request ID for tracing
-  config.headers['X-Request-ID'] = Math.random().toString(36).substring(2, 10);
-  return config;
-}, (error) => Promise.reject(error));
+    const token = getAuthToken();
+
+    // Don't overwrite an explicitly supplied Authorization header
+    if (token && !config.headers?.Authorization) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    return config;
+});
 
 // Intercept responses for global error handling and token refresh
 apiClient.interceptors.response.use(

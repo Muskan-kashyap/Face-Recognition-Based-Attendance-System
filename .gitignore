@@ -32,3 +32,5 @@ dist/
 
 # OS
 Thumbs.db
+.venv_old
+.md
