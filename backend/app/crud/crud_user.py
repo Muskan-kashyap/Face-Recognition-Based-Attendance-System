@@ -82,27 +82,65 @@ class CRUDUser:
         db.refresh(db_obj)
         return db_obj
 
-    def enroll_face(self, db: Session, *, user_id: int, embedding: list) -> FaceEmbedding:
-        """
-        Stores or replaces the face embedding for a user.
-        Marks any previous embedding as inactive.
-        """
-        # Deactivate previous
+    # def enroll_face(self, db: Session, *, user_id: int, embedding: list) -> FaceEmbedding:
+    #     """
+    #     Stores or replaces the face embedding for a user.
+    #     Marks any previous embedding as inactive.
+    #     """
+    #     # Deactivate previous
+    #     # db.query(FaceEmbedding).filter(
+    #     #     FaceEmbedding.user_id == user_id,
+    #     #     FaceEmbedding.is_active == True
+    #     # ).update({"is_active": False})
+    #     # db.commit()
+
+    #     # face_obj = FaceEmbedding(
+    #     #     user_id=user_id,
+    #     #     embedding=embedding,
+    #     #     model_name="face_recognition",
+    #     #     is_active=True
+    #     # )
+    #     db.query(FaceEmbedding).filter(
+    #         FaceEmbedding.user_id == user_id,
+    #         FaceEmbedding.is_active == 1
+    #     ).update(
+    #         {"is_active": 0},
+    #         synchronize_session=False
+    #     )
+
+    #     face_obj = FaceEmbedding(
+    #         user_id=user_id,
+    #         embedding=embedding,
+    #         model_name="face_recognition",
+    #         is_active=1
+    #     )
+    #     db.add(face_obj)
+    #     db.commit()
+    #     db.refresh(face_obj)
+    #     return face_obj
+
+    def enroll_face(self,db: Session,*,user_id: int,embedding: list,) -> FaceEmbedding:
+   
+
         db.query(FaceEmbedding).filter(
             FaceEmbedding.user_id == user_id,
-            FaceEmbedding.is_active == True
-        ).update({"is_active": False})
-        db.commit()
+            FaceEmbedding.is_active == 1,
+        ).update(
+            {"is_active": 0},
+            synchronize_session=False,
+        )
 
         face_obj = FaceEmbedding(
             user_id=user_id,
             embedding=embedding,
             model_name="face_recognition",
-            is_active=True
+            is_active=1,
         )
+
         db.add(face_obj)
         db.commit()
         db.refresh(face_obj)
+
         return face_obj
 
 

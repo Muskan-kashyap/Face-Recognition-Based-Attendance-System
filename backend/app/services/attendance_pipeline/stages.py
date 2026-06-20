@@ -33,8 +33,19 @@ class EmotionStageResult:
 
 
 def extract_liveness(image_bytes: bytes) -> LivenessStageResult:
-    is_live_bool, _ = liveness_service.detect_liveness(image_bytes)
+    import logging
+
+    logger = logging.getLogger(__name__)
+
+    if not image_bytes:
+        logger.warning("extract_liveness: empty image_bytes")
+    else:
+        logger.info("extract_liveness: bytes=%s", len(image_bytes))
+
+    is_live_bool, score = liveness_service.detect_liveness(image_bytes)
+    logger.info("extract_liveness: is_live_bool=%s score=%s", is_live_bool, score)
     return LivenessStageResult(is_live=1 if is_live_bool else 0)
+
 
 
 def extract_embedding(image_bytes: bytes) -> EmbeddingStageResult:
@@ -51,8 +62,17 @@ def match_by_vector(
     threshold: float,
     attendance_repo: AttendanceRepository,
 ) -> MatchStageResult:
+    # attendance_repo currently returns user_id only.
+    # For Phase 3 end-to-end, we keep distance None until we extend the repo.
     res = attendance_repo.find_user_by_face(db, embedding=embedding, threshold=threshold)
-    return MatchStageResult(matched_user_id=res.user_id)
+    matched_user_id = getattr(res, "user_id", None)
+    import logging
+    logger = logging.getLogger(__name__)
+    if matched_user_id is None:
+        logger.warning("match_by_vector: no user matched (threshold=%s)", threshold)
+    return MatchStageResult(matched_user_id=matched_user_id)
+
+
 
 
 def extract_emotion(image_bytes: bytes) -> EmotionStageResult:

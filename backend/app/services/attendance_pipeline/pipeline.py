@@ -8,8 +8,14 @@ from sqlalchemy.orm import Session
 from app.core.config import settings
 from app.repositories.attendance_repo import AttendanceRepository
 from app.repositories.user_repo import UserRepository
+import logging
+
 from app.services.attendance_pipeline.metric import get_face_matching_config
 from app.services.attendance_pipeline import stages
+
+logger = logging.getLogger(__name__)
+
+
 
 
 @dataclass(frozen=True)
@@ -40,6 +46,21 @@ class FaceAttendancePipeline:
     ) -> FacePipelineOutput:
         liveness_res = stages.extract_liveness(image_bytes)
         is_live = liveness_res.is_live
+
+        # Phase-3 requirement: block recognition if liveness is not passed.
+        # Development/debug mode: allow fallback when liveness is unreliable.
+        # Phase-3 requirement: block recognition if liveness is not passed.
+        # Development/debug mode: allow fallback when liveness is unreliable.
+        if is_live != 1:
+            # Temporary configuration for development only.
+            # If LIVENESS_STRICT_MODE is False, proceed to embedding/recognition.
+            if getattr(settings, "LIVENESS_STRICT_MODE", True) is False:
+                logger.warning("Liveness failed (is_live=%s) but strict mode is OFF; continuing to recognition", is_live)
+            else:
+                raise PermissionError("Liveness check failed")
+
+
+
 
         if existing_user_id is not None:
             return FacePipelineOutput(user_id=existing_user_id, emotion=None, is_live=is_live)

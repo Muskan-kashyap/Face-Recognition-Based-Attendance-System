@@ -323,6 +323,20 @@ class FaceEmbedding(Base):
                                                     comment="FaceNet 128-d — pgvector VECTOR(128)")
     zkp_public_commitment: Mapped[Optional[str]] = mapped_column(
         NVARCHAR(512), nullable=True, comment="Schnorr P=x·G — no raw biometric stored")
+
+    # Phase-3 additions
+    quality_score: Mapped[Optional[float]] = mapped_column(
+        Numeric(5, 2), nullable=True,
+        comment="Enrollment image quality score (blur/brightness/pose heuristics)")
+    embedding_version: Mapped[Optional[str]] = mapped_column(
+        NVARCHAR(50), nullable=True,
+        comment="Version tag for the embedding/extraction pipeline/model")
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False,
+        default=_utc_now, server_default=text("NOW()"),
+        comment="Row creation timestamp (UTC)")
+
+
     model_name: Mapped[str] = mapped_column(NVARCHAR(50), nullable=False,
                                              server_default=text("'Facenet'"))
     is_active: Mapped[int] = mapped_column(Integer, nullable=False, default=1,
@@ -337,6 +351,110 @@ class FaceEmbedding(Base):
               postgresql_where=text("is_active = 1")),
     )
     def __repr__(self): return f"<FaceEmbedding {self.id} user={self.user_id} active={self.is_active}>"
+
+
+class EnrollmentEvent(Base):
+    __tablename__ = "enrollment_events"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True, index=True)
+    user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id", ondelete="CASCADE"),
+                                          nullable=False, index=True)
+    org_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True),
+                                               ForeignKey("organizations.id", ondelete="RESTRICT"),
+                                               nullable=False, index=True)
+
+    status: Mapped[str] = mapped_column(
+        NVARCHAR(20), nullable=False,
+        comment="success|failed")
+    failure_reason: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+
+    quality_score: Mapped[Optional[float]] = mapped_column(Numeric(5, 2), nullable=True)
+    embedding_version: Mapped[Optional[str]] = mapped_column(NVARCHAR(50), nullable=True)
+
+    image_resolution: Mapped[Optional[str]] = mapped_column(NVARCHAR(30), nullable=True,
+                                                              comment="e.g. 640x480")
+    brightness_score: Mapped[Optional[float]] = mapped_column(Numeric(5, 2), nullable=True)
+    blur_score: Mapped[Optional[float]] = mapped_column(Numeric(6, 3), nullable=True)
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False,
+        default=_utc_now, server_default=text("NOW()"),
+        index=True)
+
+    user: Mapped["User"] = relationship("User")
+
+    __table_args__ = (
+        CheckConstraint("status IN ('success','failed')", name="ck_enrollment_status"),
+        Index("ix_enrollment_events_org_time", "org_id", "created_at"),
+    )
+
+
+class SpoofDetectionLog(Base):
+    __tablename__ = "spoof_detection_logs"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True, index=True)
+    user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id", ondelete="CASCADE"),
+                                          nullable=True, index=True)
+    org_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True),
+                                               ForeignKey("organizations.id", ondelete="RESTRICT"),
+                                               nullable=False, index=True)
+
+    attempt_type: Mapped[str] = mapped_column(
+        NVARCHAR(20), nullable=False,
+        comment="enrollment|checkin")
+    is_spoof: Mapped[int] = mapped_column(Integer, nullable=False, default=0, server_default=text("0"),
+                                          comment="1=spoof detected")
+    spoof_score: Mapped[Optional[float]] = mapped_column(Numeric(5, 2), nullable=True)
+
+    model_name: Mapped[Optional[str]] = mapped_column(NVARCHAR(50), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False,
+        default=_utc_now, server_default=text("NOW()"),
+        index=True)
+
+    user: Mapped[Optional["User"]] = relationship("User")
+
+    __table_args__ = (
+        CheckConstraint("is_spoof IN (0,1)", name="ck_spoof_is_spoof"),
+        Index("ix_spoof_logs_org_time", "org_id", "created_at"),
+    )
+
+
+class RecognitionEvent(Base):
+    __tablename__ = "recognition_events"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True, index=True)
+    org_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True),
+                                               ForeignKey("organizations.id", ondelete="RESTRICT"),
+                                               nullable=False, index=True)
+    user_id: Mapped[Optional[int]] = mapped_column(Integer, ForeignKey("users.id", ondelete="SET NULL"),
+                                                   nullable=True, index=True)
+
+    status: Mapped[str] = mapped_column(
+        NVARCHAR(20), nullable=False,
+        comment="matched|not_matched")
+
+    distance: Mapped[Optional[float]] = mapped_column(Numeric(6, 4), nullable=True,
+                                                     comment="Vector distance")
+    confidence: Mapped[Optional[float]] = mapped_column(Numeric(5, 3), nullable=True)
+
+    is_live: Mapped[int] = mapped_column(Integer, nullable=False, default=0, server_default=text("0"))
+    liveness_score: Mapped[Optional[float]] = mapped_column(Numeric(5, 3), nullable=True)
+
+    model_name: Mapped[Optional[str]] = mapped_column(NVARCHAR(50), nullable=True)
+    embedding_version: Mapped[Optional[str]] = mapped_column(NVARCHAR(50), nullable=True)
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False,
+        default=_utc_now, server_default=text("NOW()"),
+        index=True)
+
+    user: Mapped[Optional["User"]] = relationship("User")
+
+    __table_args__ = (
+        CheckConstraint("status IN ('matched','not_matched')", name="ck_recognition_status"),
+        CheckConstraint("is_live IN (0,1)", name="ck_recognition_is_live"),
+        Index("ix_recognition_events_org_time", "org_id", "created_at"),
+    )
+
+
 
 
 class EmotionLog(Base):

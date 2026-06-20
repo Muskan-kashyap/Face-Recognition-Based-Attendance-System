@@ -11,7 +11,9 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 
+
 from app.api import deps
+
 from app.core import security
 from app.core.config import settings
 from app.core.rate_limit import rate_limit_dependency
@@ -52,13 +54,19 @@ def login_access_token(
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     refresh_token_expires = timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
 
+    access_token = security.create_access_token(
+        user_obj.id,
+        expires_delta=access_token_expires,
+    )
+    refresh_token = security.create_refresh_token(
+        user_obj.id,
+        expires_delta=refresh_token_expires,
+    )
+
     return {
-        "access_token": security.create_access_token(
-            user_obj.id, expires_delta=access_token_expires
-        ),
-        "refresh_token": security.create_refresh_token(
-            user_obj.id, expires_delta=refresh_token_expires
-        ),
+
+        "access_token": access_token,
+        "refresh_token": refresh_token,
         "token_type": "bearer",
     }
 

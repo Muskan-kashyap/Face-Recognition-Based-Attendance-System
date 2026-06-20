@@ -1,0 +1,9 @@
+# Local biometric feature extraction dependencies (Phase-3 self-contained)
+# Keep these aligned with imports in backend/app/services/*
+face-recognition
+opencv-python
+opencv-contrib-python-headless
+deepface
+Pillow
+numpy
+
