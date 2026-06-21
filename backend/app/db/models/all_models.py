@@ -767,6 +767,64 @@ class Payroll(Base):
 
 
 # ── SystemSetting ─────────────────────────────────────────────────────────────
+class AuditLog(Base):
+    __tablename__ = "audit_logs"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True, index=True)
+    occurred_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False,
+        default=_utc_now, server_default=text("NOW()"),
+        index=True,
+    )
+
+    tenant_org_id: Mapped[Optional[uuid.UUID]] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("organizations.id", ondelete="SET NULL"),
+        nullable=True,
+        index=True,
+    )
+
+    actor_user_id: Mapped[Optional[int]] = mapped_column(
+        Integer,
+        ForeignKey("users.id", ondelete="SET NULL"),
+        nullable=True,
+        index=True,
+    )
+    actor_role_name: Mapped[Optional[str]] = mapped_column(NVARCHAR(80), nullable=True)
+
+    action: Mapped[str] = mapped_column(NVARCHAR(200), nullable=False, index=True)
+
+    target_type: Mapped[str] = mapped_column(NVARCHAR(100), nullable=False, index=True)
+    target_id: Mapped[str] = mapped_column(NVARCHAR(100), nullable=False, index=True)
+
+    before_state: Mapped[Optional[dict]] = mapped_column(JSONB, nullable=True)
+    after_state: Mapped[Optional[dict]] = mapped_column(JSONB, nullable=True)
+
+    reason: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+
+    ip_address: Mapped[Optional[str]] = mapped_column(NVARCHAR(64), nullable=True)
+    user_agent: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+
+    correlation_id: Mapped[Optional[str]] = mapped_column(NVARCHAR(64), nullable=True, index=True)
+
+    status: Mapped[str] = mapped_column(
+        NVARCHAR(20), nullable=False, server_default=text("'success'"),
+        comment="success|failure"
+    )
+    failure_reason: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+
+    actor_user: Mapped[Optional["User"]] = relationship("User")
+    organization: Mapped[Optional["Organization"]] = relationship("Organization")
+
+    __table_args__ = (
+        Index("ix_audit_logs_tenant_occurred", "tenant_org_id", "occurred_at"),
+        CheckConstraint("status IN ('success','failure')", name="ck_audit_status"),
+    )
+
+    def __repr__(self) -> str:
+        return f"<AuditLog {self.id} action={self.action!r} status={self.status!r}>"
+
+
 class SystemSetting(Base):
     """Stores global system configurations (e.g. blockchain_enabled)."""
     __tablename__ = "system_settings"
@@ -779,4 +837,5 @@ class SystemSetting(Base):
                                                   server_default=text("NOW()"))
     
     def __repr__(self): return f"<SystemSetting {self.setting_key}={self.setting_value!r}>"
+
 

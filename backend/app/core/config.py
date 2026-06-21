@@ -131,9 +131,13 @@ class Settings(BaseSettings):
     SMTP_PASSWORD: str = ""
     EMAIL_FROM: str = "noreply@attendance.local"
 
+    # Audit
+    AUDIT_ENABLED: bool = True
+
     # Cache & Rate Limiting
     CACHE_DIR: str = "/tmp/visioncore_cache"
     REDIS_URL: str = "redis://localhost:6379/0"
+
 
 
 @lru_cache
